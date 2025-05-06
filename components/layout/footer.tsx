@@ -10,6 +10,7 @@ import {
   Crown 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -19,8 +20,16 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <Crown className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-2xl font-bold font-playfair">Queens</span>
+                 <Image
+                            src="/queens-logo.png"
+                            alt="Queens Logo"
+                            width={120}
+                            height={40}
+                            className="h-20 w-auto"
+                            priority
+                          />
+              {/* <Crown className="h-8 w-8 text-primary" /> */}
+              {/* <span className="ml-2 text-2xl font-bold font-playfair">Queens</span> */}
             </div>
             <p className="text-sm text-gray-400">
               Corona tu estilo con nuestra exclusiva colección de moda para la mujer moderna.
