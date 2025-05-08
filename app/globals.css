@@ -85,7 +85,7 @@
 }
 
 .hero-gradient {
-  background: linear-gradient(135deg, #000 75%, rgba(0,0,0,0.95) 85%, hsl(41, 60%, 30%) 100%);
+  background: linear-gradient(45deg, #000 55%, rgba(0,0,0,0.98) 70%, hsl(41, 60%, 30%) 100%);
 }
 
 .gold-gradient {
