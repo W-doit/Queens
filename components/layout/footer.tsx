@@ -121,16 +121,16 @@ export default function Footer() {
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-primary mr-2 mt-0.5" />
                 <span className="text-sm text-gray-400">
-                  Av. Diagonal 123, 08021 Barcelona, España
+                  Calle Camino Viejo de Málaga 14G, Vélez-Málaga, 29700
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 text-primary mr-2" />
-                <span className="text-sm text-gray-400">+34 93 123 45 67</span>
+                <span className="text-sm text-gray-400">+34 614 46 98 86</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-primary mr-2" />
-                <span className="text-sm text-gray-400">info@queensmoda.com</span>
+                <span className="text-sm text-gray-400">contactaqueens@gmail.com</span>
               </li>
             </ul>
           </div>
