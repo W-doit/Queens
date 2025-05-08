@@ -35,18 +35,26 @@ export default function Footer() {
               Corona tu estilo con nuestra exclusiva colección de moda para la mujer moderna.
             </p>
             <div className="flex space-x-4">
+            <a href="https://www.instagram.com/corona_tu_estilo/" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
                 <Instagram className="h-5 w-5" />
               </Button>
+              </a>
+              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
                 <Facebook className="h-5 w-5" />
               </Button>
+              </a>
+              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
                 <Twitter className="h-5 w-5" />
               </Button>
+              </a>
+              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
                 <Youtube className="h-5 w-5" />
               </Button>
+              </a>
             </div>
           </div>
 
