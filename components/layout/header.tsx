@@ -49,7 +49,7 @@ export default function Header() {
           : "py-4"
       }`}
       style={{
-        background: "linear-gradient(135deg, #000 75%, rgba(0,0,0,0.95) 85%, hsl(41, 60%, 30%) 100%)"
+        background: "linear-gradient(45deg, #000 50%, rgba(0,0,0,0.95) 60%, hsl(41, 60%, 30%) 100%)"
       }}
     >
       <div className="container mx-auto px-4">
