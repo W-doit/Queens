@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { 
-  Instagram, 
-  Facebook, 
-  Twitter, 
-  Youtube, 
   Mail, 
   Phone, 
   MapPin, 
   Crown 
 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInstagram, faTiktok } from '@fortawesome/free-brands-svg-icons';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -37,22 +35,12 @@ export default function Footer() {
             <div className="flex space-x-4">
             <a href="https://www.instagram.com/corona_tu_estilo/" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Instagram className="h-5 w-5" />
+               <FontAwesomeIcon className="h-8 w-8" icon={faInstagram} />
               </Button>
               </a>
-              <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.tiktok.com/corona_tu_estilo" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Facebook className="h-5 w-5" />
-              </Button>
-              </a>
-              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Twitter className="h-5 w-5" />
-              </Button>
-              </a>
-              <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Youtube className="h-5 w-5" />
+                   <FontAwesomeIcon className="h-6 w-6" icon={faTiktok} />
               </Button>
               </a>
             </div>
