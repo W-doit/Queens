@@ -83,17 +83,17 @@ export default function Header() {
 
           {/* Search, Cart, User - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+            <Button variant="ghost" size="icon" className="text-white hover:text-black">
               <Search className="h-5 w-5" />
             </Button>
             <Link href="/carrito">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+                <Button variant="ghost" size="icon" className="text-white hover:text-black">
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -111,14 +111,14 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center space-x-4">
             <Link href="/carrito">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </Link>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-white hover:text-primary"
+              className="text-white hover:text-black"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

@@ -98,7 +98,7 @@ export default function FeaturedProducts() {
                     <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
                       <ShoppingCart className="h-4 w-4" />
                     </Button>
-                    <Button size="icon" variant="outline" className="rounded-full border-white text-white hover:bg-white/20">
+                    <Button size="icon" variant="outline" className="rounded-full border-white text-black hover:bg-white/20">
                       <Heart className="h-4 w-4" />
                     </Button>
                   </div>

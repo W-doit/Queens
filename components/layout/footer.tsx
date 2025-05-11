@@ -34,12 +34,12 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
             <a href="https://www.instagram.com/corona_tu_estilo/" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
                <FontAwesomeIcon className="h-8 w-8" icon={faInstagram} />
               </Button>
               </a>
               <a href="https://www.tiktok.com/corona_tu_estilo" target="_blank" rel="noopener noreferrer">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
                    <FontAwesomeIcon className="h-6 w-6" icon={faTiktok} />
               </Button>
               </a>
@@ -115,7 +115,7 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 font-playfair">Contacto</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <MapPin className="h-5 w-5 text-primary mr-2 mt-0.5" />
+                <MapPin className="h-5 w-5 text-primary mr-2" />
                 <span className="text-sm text-gray-400">
                   Calle Camino Viejo de Málaga 14G, Vélez-Málaga, 29700
                 </span>
