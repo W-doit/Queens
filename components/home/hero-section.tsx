@@ -78,7 +78,7 @@ export default function HeroSection() {
               asChild
               variant="outline"
               size="lg"
-              className="border-primary text-primary hover:bg-primary/10"
+              className="border-primary text-primary hover:bg-primary/10 hover:text-white"
             >
               <Link
                 href="/vestidor-virtual"
