@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Search, Bell, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   DropdownMenu, 
@@ -12,6 +12,8 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+
 
 const navItems = [
   { name: "Inicio", href: "/" },
@@ -25,6 +27,8 @@ const navItems = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+   const [adminName, setAdminName] = useState(""); 
   const pathname = usePathname();
 
   useEffect(() => {
@@ -37,9 +41,24 @@ export default function Header() {
       }
     };
 
+    // Check if user is admin
+    const isAdmin = localStorage.getItem("isAdmin") === "true";
+    setIsAdmin(isAdmin)
+
+    //Mockup admin name
+      if (isAdmin) {
+      setAdminName("Nombre Apellido");
+    }
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // logout function
+    const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    window.location.href = "/login";
+  };
 
   return (
     <header
@@ -49,23 +68,42 @@ export default function Header() {
           : "py-4"
       }`}
       style={{
-        background: "linear-gradient(45deg, #000 50%, rgba(0,0,0,0.95) 60%, hsl(41, 60%, 30%) 100%)"
+        background: "linear-gradient(45deg, #000, rgba(0,0,0,0.95) 60%, hsl(41, 60%, 30%) 100%)"
       }}
     >
-      <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
-          {/* Logo is now in hero-section*/}
-          {/* <Link href="/" className="flex items-center">
-            <Image
-              src="/queens-logo.png"
-              alt="Queens Logo"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
-              priority
-            />
-          </Link> */}
+          {/* Admin-header*/}
+          {isAdmin ? (
+            <>
+             {/* Admin Name */}
+              <h1 className="text-lg font-light text-white">Bienvenido/a, {adminName}</h1>
 
+                {/* Notification Button */}
+                <button className="p-2 rounded-full bg-primary/10 hover:bg-primary/20">
+                  <Bell className="h-5 w-5 text-primary" />
+                </button>
+
+        {/* Logout Button */}
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button
+        onClick={handleLogout}
+        className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20"
+      >
+        <LogOut className="h-5 w-5 text-white" />
+      </button>
+    </TooltipTrigger>
+    <TooltipContent side="top">
+      Log out
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+              </div>
+            </>
+          ) : (
+            <>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
@@ -107,6 +145,8 @@ export default function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          </>
+          )}
 
           {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center space-x-4">
