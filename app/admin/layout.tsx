@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Layout, Menu, Store, Package, Users, Clock, BarChart } from "lucide-react";
+import { Layout, Menu, Store, Package, Users, Clock, BarChart, X, Bell, LogOut } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -12,6 +12,7 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     // In a real app, verify admin status here
@@ -26,16 +27,32 @@ export default function AdminLayout({
   if (!isAuthorized) {
     return null;
   }
-
+  
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("isAdmin");
+    router.push("/login");
+  };
+  
   return (
     <div className="flex min-h-screen bg-background">
+      {/* sidebar button */}
+<button
+  className="md:hidden p-2 fixed top-4 left-4 z-50 bg-card rounded-md"
+  onClick={() => setIsMenuOpen(!isMenuOpen)}
+>
+  {isMenuOpen ? <X size={24} className="text-black" /> : <Menu size={24} />}
+</button>
       {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border">
+          <aside
+        className={`fixed inset-y-0 left-0 w-64 bg-card border-r border-border transform ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform md:translate-x-0 z-40 mt-16`}
+      >
         <div className="p-6 border-b border-border">
           <h1 className="text-xl font-bold font-playfair">Queens Admin</h1>
         </div>
         <nav className="p-4">
-          <Menu>
             <div className="space-y-2">
               <a
                 href="/admin"
@@ -93,12 +110,12 @@ export default function AdminLayout({
                 <span>Control Horario</span>
               </a>
             </div>
-          </Menu>
+          
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 ml-0 md:ml-64">
         {children}
       </main>
     </div>

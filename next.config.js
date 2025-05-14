@@ -5,14 +5,14 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: { unoptimized: true },
-  experimental: {
-    fontLoaders: [
-      {
-        loader: '@next/font/google',
-        options: { timeout: 10000 },
-      },
-    ],
-  },
+  // experimental: {
+  //   fontLoaders: [
+  //     {
+  //       loader: '@next/font/google',
+  //       options: { timeout: 10000 },
+  //     },
+  //   ],
+  // },
   webpack: (config, { isServer, webpack }) => {
     config.cache = false;
     return config;
