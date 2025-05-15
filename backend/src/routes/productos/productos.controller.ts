@@ -11,7 +11,11 @@ import {
   ProductListResponse,
   SizeInfo,
 } from "../../types/productos";
-import { formatImageForOdoo, generateBarcode, handleSizeVariants } from "../../services/productos.service";
+import {
+  formatImageForOdoo,
+  generateBarcode,
+  handleSizeVariants,
+} from "../../services/productos.service";
 
 /**
  * Get products with pagination, filtering, and sorting
@@ -38,7 +42,7 @@ export const getProducts = async (req: Request, res: Response) => {
   // Build sort order
   let order = "name ASC";
   if (sort === "newest") {
-    order = "id DESC"; 
+    order = "id DESC";
   } else if (sort === "price_low") {
     order = "list_price ASC";
   } else if (sort === "price_high") {
@@ -129,7 +133,7 @@ export const getProducts = async (req: Request, res: Response) => {
         barcode: product.barcode,
         categ_id: product.categ_id,
         image_url: product.image_1920
-          ? `/api/product/${product.id}/image`
+          ? `/api/products/${product.id}/image`
           : undefined,
         qty_available: product.qty_available,
         default_code: product.default_code,
@@ -188,10 +192,7 @@ export const getProductById = async (req: Request, res: Response) => {
     let sizes: SizeInfo[] = [];
 
     // Get size variants if available
-    if (
-      product.product_variant_ids &&
-      product.product_variant_ids.length > 1
-    ) {
+    if (product.product_variant_ids && product.product_variant_ids.length > 1) {
       // Fetch variants to get size information
       const variants = await callOdoo<ProductVariant[]>(
         "product.product",
@@ -279,13 +280,11 @@ export const createProduct = async (req: Request, res: Response) => {
     }
 
     if (list_price === undefined || list_price < 0) {
-      return res
-        .status(400)
-        .json({ error: "Valid product price is required" });
+      return res.status(400).json({ error: "Valid product price is required" });
     }
 
     // Generate barcode if not provided
-    const productBarcode = barcode || await generateBarcode();
+    const productBarcode = barcode || (await generateBarcode());
 
     // Prepare the product data
     const productData: any = {
@@ -371,7 +370,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     if (default_code !== undefined) updateData.default_code = default_code;
     if (sale_ok !== undefined) updateData.sale_ok = sale_ok;
     if (purchase_ok !== undefined) updateData.purchase_ok = purchase_ok;
-    
+
     // Process image if provided
     if (image_1920 !== undefined) {
       updateData.image_1920 = formatImageForOdoo(image_1920);
@@ -379,8 +378,8 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     // Validate that there's something to update
     if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({ 
-        error: "No valid fields to update" 
+      return res.status(400).json({
+        error: "No valid fields to update",
       });
     }
 
@@ -397,9 +396,9 @@ export const updateProduct = async (req: Request, res: Response) => {
       }
     }
 
-    res.json({ 
-      message: "Product updated successfully", 
-      id 
+    res.json({
+      message: "Product updated successfully",
+      id,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -412,30 +411,26 @@ export const updateProduct = async (req: Request, res: Response) => {
 /**
  * Delete a product
  */
+//
+
+/**
+ * Delete a product
+ */
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
 
-    // Check if product exists
-    const products = await callOdoo<any[]>(
-      "product.template", 
-      "search_read", 
-      [["id", "=", id]], 
-      { fields: ["id"] }
-    );
-
-    if (!products || products.length === 0) {
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    // Delete the product
+    // IMPORTANT: The format should be [id] not [[id]]
+    // Odoo expects an array of IDs to delete, not a nested array
     await callOdoo("product.template", "unlink", [[id]]);
 
-    res.json({ 
-      message: "Product deleted successfully", 
-      id 
+    res.json({
+      message: "Product deleted successfully",
+      id,
     });
   } catch (error: any) {
+    console.error("Delete error details:", error);
+
     res.status(500).json({
       error: "Failed to delete product",
       message: error.message,
