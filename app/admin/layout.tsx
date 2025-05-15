@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Layout, Menu, Store, Package, Users, Clock, BarChart, X, Bell, LogOut } from "lucide-react";
+import { Layout, Menu, Store, Package, Users, Clock, BarChart, X, Bell, LogOut, Settings } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -28,12 +28,6 @@ export default function AdminLayout({
     return null;
   }
   
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("isAdmin");
-    router.push("/login");
-  };
-  
   return (
     <div className="flex min-h-screen bg-background">
       {/* sidebar button */}
@@ -41,7 +35,7 @@ export default function AdminLayout({
   className="md:hidden p-2 fixed top-4 left-4 z-50 bg-card rounded-md"
   onClick={() => setIsMenuOpen(!isMenuOpen)}
 >
-  {isMenuOpen ? <X size={24} className="text-black" /> : <Menu size={24} />}
+  {isMenuOpen ? <X size={20} className="text-black" /> : <Menu size={20} />}
 </button>
       {/* Sidebar */}
           <aside
@@ -108,6 +102,19 @@ export default function AdminLayout({
               >
                 <Clock size={20} />
                 <span>Control Horario</span>
+              </a>
+
+                {/* settings */}
+                    <a
+                href="/admin/ajustes"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                  pathname === "/admin/ajustes"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+              >
+                <Settings size={20} />
+                <span>Ajustes</span>
               </a>
             </div>
           
