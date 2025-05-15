@@ -1,0 +1,1 @@
+// POS types (sales, sessions, etc.)
