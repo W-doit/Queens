@@ -53,7 +53,7 @@ export default function Header() {
       }
     };
 
-    // Check if user is admin
+    // Check if user is admin in localStorage, this is a mockup
     const isAdmin = localStorage.getItem("isAdmin") === "true";
     setIsAdmin(isAdmin);
 
@@ -66,7 +66,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // logout function
+  // Mockup logout function
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
     window.location.href = "/login";

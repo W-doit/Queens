@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Layout, Menu, Store, Package, Users, Clock, BarChart, X, Bell, LogOut, Settings } from "lucide-react";
+import { Layout, Menu, Store, Package, Users, Clock, BarChart, X, Bell, LogOut, Settings, ShoppingBag } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -59,6 +59,19 @@ export default function AdminLayout({
                 <BarChart size={20} />
                 <span>Dashboard</span>
               </a>
+
+              <a
+                href="/admin/pos"
+                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                  pathname === "/admin/pos"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+              >
+             <Store size={20} />
+                <span>Punto de venta</span>
+              </a>
+
               <a
                 href="/admin/productos"
                 className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
@@ -78,7 +91,7 @@ export default function AdminLayout({
                     : "hover:bg-muted"
                 }`}
               >
-                <Store size={20} />
+                <ShoppingBag size={20} />
                 <span>Pedidos</span>
               </a>
               <a
