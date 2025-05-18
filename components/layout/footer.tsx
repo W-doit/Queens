@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { 
-  Instagram, 
-  Facebook, 
-  Twitter, 
-  Youtube, 
   Mail, 
   Phone, 
   MapPin, 
   Crown 
 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInstagram, faTiktok } from '@fortawesome/free-brands-svg-icons';
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -35,18 +33,16 @@ export default function Footer() {
               Corona tu estilo con nuestra exclusiva colección de moda para la mujer moderna.
             </p>
             <div className="flex space-x-4">
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Instagram className="h-5 w-5" />
+            <a href="https://www.instagram.com/corona_tu_estilo/" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
+               <FontAwesomeIcon className="h-8 w-8" icon={faInstagram} />
               </Button>
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="https://www.tiktok.com/corona_tu_estilo" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="text-white hover:text-black">
+                   <FontAwesomeIcon className="h-6 w-6" icon={faTiktok} />
               </Button>
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Twitter className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-white hover:text-primary">
-                <Youtube className="h-5 w-5" />
-              </Button>
+              </a>
             </div>
           </div>
 
@@ -119,18 +115,18 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 font-playfair">Contacto</h3>
             <ul className="space-y-3">
               <li className="flex items-start">
-                <MapPin className="h-5 w-5 text-primary mr-2 mt-0.5" />
+                <MapPin className="h-5 w-5 text-primary mr-2" />
                 <span className="text-sm text-gray-400">
-                  Av. Diagonal 123, 08021 Barcelona, España
+                  Calle Camino Viejo de Málaga 14G, Vélez-Málaga, 29700
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone className="h-5 w-5 text-primary mr-2" />
-                <span className="text-sm text-gray-400">+34 93 123 45 67</span>
+                <span className="text-sm text-gray-400">+34 614 46 98 86</span>
               </li>
               <li className="flex items-center">
                 <Mail className="h-5 w-5 text-primary mr-2" />
-                <span className="text-sm text-gray-400">info@queensmoda.com</span>
+                <span className="text-sm text-gray-400">contactaqueens@gmail.com</span>
               </li>
             </ul>
           </div>
