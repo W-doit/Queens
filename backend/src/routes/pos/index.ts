@@ -23,11 +23,14 @@ router.post(
   "/session/activate",
   asyncHandler(SessionController.activateSession)
 );
+router.post("/session/force", asyncHandler(SessionController.forcePosSession));
 router.post("/session/close", asyncHandler(SessionController.closeSession));
 router.post(
   "/session/force-close",
   asyncHandler(SessionController.forceCloseSession)
 );
+router.get("/session/:id", asyncHandler(SessionController.getSessionDetails));
+router.post("/fix", asyncHandler(SessionController.fixPosData));
 
 // Order management routes
 router.post("/orders", asyncHandler(VentasController.createOrder));
