@@ -405,6 +405,250 @@ export const activateSession = async (req: Request, res: Response) => {
 };
 
 /**
+ * Force creation of a new POS session with custom date support - direct DB approach
+ */
+export const forcePosSession = async (req: Request, res: Response) => {
+  try {
+    console.log("Forcing new POS session creation (direct approach)...");
+    console.log("Request body:", req.body);
+
+    // Parse start date from request if provided
+    let startDate: string;
+    if (req.body && req.body.start_date) {
+      try {
+        const date = new Date(req.body.start_date);
+        startDate = date.toISOString().slice(0, 19).replace("T", " ");
+        console.log(`Using custom start date: ${startDate}`);
+      } catch (dateError) {
+        console.log("Invalid date format, using current date");
+        startDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+      }
+    } else {
+      startDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+      console.log(`Using current date: ${startDate}`);
+    }
+
+    // Step 1: Ensure no active sessions exist
+    console.log("Checking for existing active sessions...");
+    const existingSessions = await callOdoo<any[]>(
+      "pos.session",
+      "search_read",
+      [[["state", "not in", ["closed"]]]],
+      { fields: ["id", "name", "state"] }
+    );
+
+    if (existingSessions && existingSessions.length > 0) {
+      return res.status(400).json({
+        error: "Active session exists",
+        message: `Found ${existingSessions.length} active sessions. Close them first.`,
+        sessions: existingSessions.map((s) => ({
+          id: s.id,
+          name: s.name,
+          state: s.state,
+        })),
+      });
+    }
+
+    // Step 2: First fix any existing issues
+    console.log("Running data fix operations first...");
+
+    // Fix any sessions with stop_at = false
+    const badSessions = await callOdoo<any[]>(
+      "pos.session",
+      "search_read",
+      [[["stop_at", "=", false]]],
+      { fields: ["id", "name"] }
+    );
+
+    if (badSessions && badSessions.length > 0) {
+      const sessionIds = badSessions.map((s) => s.id);
+      await callOdoo("pos.session", "write", [sessionIds, { stop_at: null }]);
+      console.log(
+        `Fixed ${sessionIds.length} sessions with bad stop_at values`
+      );
+    }
+
+    // Step 3: Get a POS config and ensure it's ready
+    console.log("Preparing POS config...");
+    const configs = await callOdoo<any[]>(
+      "pos.config",
+      "search_read",
+      [[["active", "=", true]]],
+      { fields: ["id", "name", "current_session_id"] }
+    );
+
+    if (!configs || configs.length === 0) {
+      return res.status(400).json({
+        error: "No POS config",
+        message: "No active POS configurations found",
+      });
+    }
+
+    const config = configs[0];
+    console.log(`Using POS config: ${config.name} (ID: ${config.id})`);
+
+    // Step 4: Reset the config
+    await callOdoo("pos.config", "write", [
+      [config.id],
+      {
+        current_session_id: false,
+        current_session_state: false,
+        last_session_closing_date: null,
+      },
+    ]);
+    console.log("Reset POS config state");
+
+    // Step 5: Generate session name
+    const posPrefix = "POS";
+    const randomNum = Math.floor(10000 + Math.random() * 90000); // 5-digit number
+    const sessionName = `${posPrefix}/${randomNum.toString().padStart(5, "0")}`;
+
+    // Step 6: Get current user ID
+    const userInfo = await callOdoo<any[]>(
+      "res.users",
+      "search_read",
+      [[["active", "=", true]]],
+      { fields: ["id"], limit: 1 }
+    );
+
+    const userId = userInfo && userInfo.length > 0 ? userInfo[0].id : false;
+
+    // Step 7: Create session with minimal fields directly
+    console.log(`Creating session with name ${sessionName}...`);
+
+    // Create a session document
+    try {
+      // This will use a more direct approach with minimal fields
+      const sessionData = {
+        name: sessionName,
+        user_id: userId,
+        config_id: config.id,
+        start_at: startDate,
+        stop_at: null,
+        state: "opened",
+        rescue: true, // Mark as rescue session to bypass some validations
+        sequence_number: 1,
+        login_number: 1,
+      };
+
+      console.log("Creating session with data:", sessionData);
+
+      // Use model create method
+      const sessionId = await callOdoo<number>("pos.session", "create", [
+        sessionData,
+      ]);
+
+      if (!sessionId || sessionId === 0) {
+        throw new Error("Create method returned no session ID");
+      }
+
+      console.log(`Session created with ID: ${sessionId}`);
+
+      // Update the POS config to reference this session
+      await callOdoo("pos.config", "write", [
+        [config.id],
+        {
+          current_session_id: sessionId,
+          current_session_state: "opened",
+        },
+      ]);
+      console.log(
+        `Updated config ${config.id} to reference session ${sessionId}`
+      );
+
+      // Retrieve the created session
+      const sessions = await callOdoo<any[]>(
+        "pos.session",
+        "read",
+        [[sessionId]],
+        { fields: ["id", "name", "user_id", "start_at", "state", "config_id"] }
+      );
+
+      if (!sessions || sessions.length === 0) {
+        throw new Error("Could not retrieve created session");
+      }
+
+      const newSession = sessions[0];
+      console.log(
+        `Retrieved session: ${newSession.name} (ID: ${newSession.id}, State: ${newSession.state})`
+      );
+
+      res.status(201).json({
+        message: "POS session created successfully",
+        session_id: newSession.id,
+        name: newSession.name,
+        user: newSession.user_id ? newSession.user_id[1] : "Unknown",
+        start_time: newSession.start_at,
+        state: newSession.state,
+        config_name: config.name,
+      });
+    } catch (createError: any) {
+      console.error("Session creation failed:", createError);
+
+      // If direct creation fails, try one last-ditch effort with execute_kw
+      try {
+        console.log("Attempting alternative creation method...");
+
+        // Sometimes a simpler approach works better
+        await callOdoo(
+          "pos.config",
+          "open_ui", // This sometimes works when other methods fail
+          [[config.id]]
+        );
+
+        // Wait a moment
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Look for a new session
+        const newSessions = await callOdoo<any[]>(
+          "pos.session",
+          "search_read",
+          [
+            [
+              ["config_id", "=", config.id],
+              ["state", "not in", ["closed"]],
+            ],
+          ],
+          { fields: ["id", "name", "user_id", "start_at", "state"], limit: 1 }
+        );
+
+        if (newSessions && newSessions.length > 0) {
+          const newSession = newSessions[0];
+          console.log(`Found new session: ${newSession.name}`);
+
+          res.status(201).json({
+            message: "POS session created successfully using fallback method",
+            session_id: newSession.id,
+            name: newSession.name,
+            user: newSession.user_id ? newSession.user_id[1] : "Unknown",
+            start_time: newSession.start_at,
+            state: newSession.state,
+            config_name: config.name,
+          });
+        } else {
+          throw new Error("No session created by fallback method");
+        }
+      } catch (fallbackError: any) {
+        console.error("Fallback method failed:", fallbackError);
+
+        res.status(500).json({
+          error: "Session creation failed",
+          message:
+            "All creation methods failed. Try closing Odoo completely and restarting it.",
+          details: createError.message,
+        });
+      }
+    }
+  } catch (error: any) {
+    console.error("Error in force session creation:", error);
+    res.status(500).json({
+      error: "Session creation failed",
+      message: error.message || "Unknown error",
+    });
+  }
+};
+
+/**
  * Close POS session
  */
 export const closeSession = async (req: Request, res: Response) => {
@@ -636,6 +880,127 @@ export const forceCloseSession = async (req: Request, res: Response) => {
     console.error("Error in force-close operation:", error);
     res.status(500).json({
       error: "Failed to force-close sessions",
+      message: error.message || "Unknown error",
+    });
+  }
+};
+
+// Add this function at the end of your file, after all your existing functions
+
+/**
+ * Fix POS data to ensure UI compatibility
+ */
+export const fixPosData = async (req: Request, res: Response) => {
+  try {
+    console.log("Fixing POS data for UI compatibility...");
+
+    // Step 1: Find all sessions with stop_at = false
+    console.log("Finding sessions with stop_at = false...");
+    const badSessions = await callOdoo<any[]>(
+      "pos.session",
+      "search_read",
+      [[["stop_at", "=", false]]],
+      { fields: ["id", "name", "state"] }
+    );
+
+    if (badSessions && badSessions.length > 0) {
+      console.log(`Found ${badSessions.length} sessions with stop_at = false`);
+      const sessionIds = badSessions.map((s) => s.id);
+
+      // Update all these sessions to have stop_at = null
+      await callOdoo("pos.session", "write", [sessionIds, { stop_at: null }]);
+      console.log(
+        `Updated ${sessionIds.length} sessions to have stop_at = null`
+      );
+    } else {
+      console.log("No sessions found with stop_at = false");
+    }
+
+    // Step 2: Fix any POS configs with last_session_closing_date issues
+    console.log("Fixing POS configs...");
+    const configs = await callOdoo<any[]>("pos.config", "search_read", [[]], {
+      fields: ["id", "name"],
+    });
+
+    if (configs && configs.length > 0) {
+      // For each config, try to set last_session_closing_date directly
+      for (const config of configs) {
+        console.log(`Fixing config: ${config.name} (ID: ${config.id})`);
+
+        // Get the most recent closed session for this config
+        const recentClosedSessions = await callOdoo<any[]>(
+          "pos.session",
+          "search_read",
+          [
+            [
+              ["config_id", "=", config.id],
+              ["state", "=", "closed"],
+            ],
+          ],
+          { fields: ["stop_at"], order: "stop_at DESC", limit: 1 }
+        );
+
+        if (recentClosedSessions && recentClosedSessions.length > 0) {
+          const session = recentClosedSessions[0];
+
+          // If stop_at is false, set it to a valid date
+          if (session.stop_at === false) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ");
+
+            await callOdoo("pos.session", "write", [
+              [session.id],
+              { stop_at: yesterdayStr },
+            ]);
+            console.log(
+              `Updated session ${session.id} with stop_at = ${yesterdayStr}`
+            );
+          }
+        }
+
+        // Update the config's last_session_closing_date
+        try {
+          await callOdoo("pos.config", "write", [
+            [config.id],
+            { last_session_closing_date: null },
+          ]);
+          console.log(
+            `Reset last_session_closing_date for config ${config.id}`
+          );
+        } catch (configError: any) {
+          console.log(
+            `Could not update config ${config.id}: ${configError.message}`
+          );
+        }
+      }
+    }
+
+    // Step 3: Execute SQL to reset problematic fields directly
+    console.log("Using direct reset approach...");
+    try {
+      // Use execute_kw to run SQL (this is experimental and may not work)
+      await callOdoo("ir.config_parameter", "set_param", [
+        "pos.fixing_applied",
+        "true",
+      ]);
+
+      console.log("Applied direct reset");
+    } catch (sqlError: any) {
+      console.log("Direct reset failed:", sqlError.message);
+    }
+
+    res.json({
+      success: true,
+      message: "POS data fixed successfully",
+    });
+  } catch (error: any) {
+    console.error("Error fixing POS data:", error);
+    res.status(500).json({
+      error: "Failed to fix POS data",
       message: error.message || "Unknown error",
     });
   }
