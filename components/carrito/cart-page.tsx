@@ -18,7 +18,7 @@ const initialCartItems = [
     name: "Vestido Dorado Elegante",
     price: 129.99,
     quantity: 1,
-    image: "https://images.pexels.com/photos/7319464/pexels-photo-7319464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    image: "http://www.w3.org/2000/svg",
     size: "M",
   },
   {
@@ -105,14 +105,22 @@ export default function CartPage() {
             <Card className="p-6">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex flex-col sm:flex-row gap-4 py-4 border-b last:border-0">
-                  <div className="relative w-full sm:w-24 h-32 bg-gray-100 overflow-hidden rounded-md">
+                  {/* <div className="relative w-full sm:w-24 h-32 bg-gray-100 overflow-hidden rounded-md">
                     <Image
                       src={item.image}
                       alt={item.name}
                       fill
                       className="object-cover"
                     />
-                  </div>
+                  </div> */}
+                  
+  <span className="text-gray-400 text-6xl">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      <path d="M8 17l4-4 4 4" strokeWidth="2" />
+      <circle cx="9" cy="9" r="2" strokeWidth="2" />
+    </svg>
+  </span>
                   
                   <div className="flex-grow">
                     <div className="flex justify-between">

@@ -32,7 +32,7 @@ const navItems = [
   { name: "Productos", href: "/productos" },
   { name: "Categorías", href: "/categorias" },
   { name: "Vestidor Virtual", href: "/vestidor-virtual" },
-  { name: "Sobre Nosotros", href: "/sobre-nosotros" },
+  // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
   { name: "Contacto", href: "/contacto" },
 ];
 
