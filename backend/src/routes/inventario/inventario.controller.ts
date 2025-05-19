@@ -383,168 +383,116 @@ export const getLocations = async (req: Request, res: Response) => {
 /**
  * Get inventory movements for a product
  */
+/**
+ * Get inventory movements for a product
+ */
 export const getMovements = async (req: Request, res: Response) => {
   try {
-    // Parse parameters with validation
-    const productIdParam = req.params.id;
-    if (!productIdParam) {
-      return res.status(400).json({ error: "Product ID is required" });
-    }
+    const productId = parseInt(req.params.id);
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = parseInt(req.query.offset as string) || 0;
 
-    const productId = parseInt(productIdParam);
-
-    // Validate product ID
-    if (isNaN(productId)) {
-      return res.status(400).json({ error: "Invalid product ID" });
-    }
-
-    // Parse other query parameters
-    const variantId = req.query.variant_id
-      ? parseInt(req.query.variant_id as string)
-      : undefined;
-
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
-
-    const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
-
-    // Build domain filter
-    let domain: any[] = [];
-
-    if (variantId) {
-      // If variant ID is provided, search for that specific variant
-      domain.push(["product_id", "=", variantId]);
-    } else {
-      // If only product ID is provided, search for all its variants
-      const variants = await callOdoo<any[]>(
-        "product.product",
-        "search_read",
-        [["product_tmpl_id", "=", productId]],
-        { fields: ["id"] }
-      );
-
-      if (variants && variants.length > 0) {
-        const variantIds = variants.map((v) => v.id);
-        domain.push(["product_id", "in", variantIds]);
-      } else {
-        return res.status(404).json({ error: "Product not found" });
-      }
-    }
-
-    // Get movements
-    const moves = await callOdoo<any[]>("stock.move", "search_read", [domain], {
-      fields: [
-        "id",
-        "reference",
-        "origin",
-        "product_id",
-        "product_qty",
-        "location_id",
-        "location_dest_id",
-        "state",
-        "date",
-      ],
-      limit,
-      offset,
-      order: "date DESC",
-    });
-
-    // Get total count
-    const total = await callOdoo<number>("stock.move", "search_count", [
-      domain,
-    ]);
-
-    // Format movements with location names
-    const formattedMoves = await Promise.all(
-      moves.map(async (move) => {
-        // Get location names
-        const fromLocationResult = await callOdoo<any[]>(
-          "stock.location",
-          "read",
-          [[move.location_id[0]]],
-          { fields: ["name"] }
-        );
-
-        const toLocationResult = await callOdoo<any[]>(
-          "stock.location",
-          "read",
-          [[move.location_dest_id[0]]],
-          { fields: ["name"] }
-        );
-
-        // Safely extract location names
-        const fromLocationName =
-          fromLocationResult && fromLocationResult.length > 0
-            ? fromLocationResult[0].name
-            : "Unknown";
-
-        const toLocationName =
-          toLocationResult && toLocationResult.length > 0
-            ? toLocationResult[0].name
-            : "Unknown";
-
-        // Determine movement type
-        let type: "inbound" | "outbound" | "internal" = "internal";
-        const fromLocationId = move.location_id[0];
-        const toLocationId = move.location_dest_id[0];
-
-        // Check if source or destination is a customer/supplier/inventory location
-        const internalLocations = await callOdoo<any[]>(
-          "stock.location",
-          "search_read",
-          [["usage", "=", "internal"]],
-          { fields: ["id"] }
-        );
-
-        const internalLocationIds = internalLocations.map((loc) => loc.id);
-
-        const isSourceInternal = internalLocationIds.includes(fromLocationId);
-        const isDestInternal = internalLocationIds.includes(toLocationId);
-
-        if (isSourceInternal && !isDestInternal) {
-          type = "outbound";
-        } else if (!isSourceInternal && isDestInternal) {
-          type = "inbound";
-        }
-
-        // Format movement
-        const movement: InventoryMovement = {
-          id: move.id,
-          reference: move.reference || "",
-          origin: move.origin,
-          product_id: move.product_id[0],
-          product_name: move.product_id[1],
-          quantity: move.product_qty,
-          from_location: {
-            id: fromLocationId,
-            name: fromLocationName,
-          },
-          to_location: {
-            id: toLocationId,
-            name: toLocationName,
-          },
-          state: move.state,
-          date: move.date,
-          type,
-        };
-
-        return movement;
-      })
+    // First verify the product exists
+    const product = await callOdoo(
+      "product.product",
+      "search_read",
+      [[["id", "=", productId]]],
+      { fields: ["name", "display_name"] }
     );
 
-    // Build response
-    const response: MovementsResponse = {
-      movements: formattedMoves,
-      total,
-      page: Math.floor(offset / limit) + 1,
-      limit,
-    };
+    if (!product || product.length === 0) {
+      // If not found as product.product, try product.template
+      const template = await callOdoo(
+        "product.template",
+        "search_read",
+        [[["id", "=", productId]]],
+        { fields: ["name"] }
+      );
 
-    res.json(response);
+      if (!template || template.length === 0) {
+        return res.status(404).json({ error: "Product not found" });
+      }
+
+      // Get variant IDs for this template
+      const variants = await callOdoo("product.product", "search", [
+        [["product_tmpl_id", "=", productId]],
+      ]);
+
+      if (!variants || variants.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "No variants found for this product template" });
+      }
+
+      // Get stock moves for all variants of this template
+      const moves = await callOdoo(
+        "stock.move",
+        "search_read",
+        [[["product_id", "in", variants]]],
+        {
+          fields: [
+            "name",
+            "product_id",
+            "product_qty",
+            "location_id",
+            "location_dest_id",
+            "state",
+            "date",
+          ],
+          order: "date desc",
+          limit: limit,
+          offset: offset,
+        }
+      );
+
+      return res.json({
+        product: template[0],
+        movements: moves,
+        count: moves.length,
+        total: await callOdoo("stock.move", "search_count", [
+          [["product_id", "in", variants]],
+        ]),
+        page: offset / limit + 1,
+        limit: limit,
+      });
+    }
+
+    // Product found directly, get its movements
+    const moves = await callOdoo(
+      "stock.move",
+      "search_read",
+      [[["product_id", "=", productId]]],
+      {
+        fields: [
+          "name",
+          "product_id",
+          "product_qty",
+          "location_id",
+          "location_dest_id",
+          "state",
+          "date",
+        ],
+        order: "date desc",
+        limit: limit,
+        offset: offset,
+      }
+    );
+
+    return res.json({
+      product: product[0],
+      movements: moves,
+      count: moves.length,
+      total: await callOdoo("stock.move", "search_count", [
+        [["product_id", "=", productId]],
+      ]),
+      page: offset / limit + 1,
+      limit: limit,
+    });
   } catch (error: any) {
-    console.error("Error fetching inventory movements:", error);
-    res.status(500).json({
-      error: "Failed to fetch inventory movements",
-      message: error.message,
+    console.error("Error getting product movements:", error);
+    return res.status(500).json({
+      error: "Failed to get product movements",
+      message: error.message || "An unexpected error occurred",
     });
   }
 };

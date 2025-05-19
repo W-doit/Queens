@@ -1,7 +1,5 @@
 // POS router for physical store
 
-// POS router for physical store
-
 import express from "express";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import * as SessionController from "./session.controller";
@@ -63,5 +61,7 @@ router.post(
   "/orders/:id/receipt/print",
   asyncHandler(ReceiptController.printReceipt)
 );
+
+router.post("/orders/:id/confirm", asyncHandler(VentasController.confirmOrder));
 
 export default router;

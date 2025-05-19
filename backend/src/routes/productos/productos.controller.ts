@@ -411,11 +411,6 @@ export const updateProduct = async (req: Request, res: Response) => {
 /**
  * Delete a product
  */
-//
-
-/**
- * Delete a product
- */
 export const deleteProduct = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
@@ -437,3 +432,4 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
+
