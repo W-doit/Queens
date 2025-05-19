@@ -12,6 +12,8 @@ import {
   getProductVariants,
   updateProductVariants,
   updateVariantStock,
+  deleteProductVariants,
+  getVariantStock,
 } from "./variantes.controller";
 import { getProductImage, uploadProductImage } from "./imagen.controller";
 
@@ -86,5 +88,19 @@ router.put("/:id/variants", asyncHandler(updateProductVariants));
  * @access  Private
  */
 router.put("/variants/:variantId/stock", asyncHandler(updateVariantStock));
+
+/**
+ * @route   GET /api/productos/variants/:variantId/stock
+ * @desc    Get stock information for a specific variant
+ * @access  Public
+ */
+router.get("/variants/:variantId/stock", asyncHandler(getVariantStock));
+
+/**
+ * @route   DELETE /api/productos/:id/variants
+ * @desc    Delete all variants for a product
+ * @access  Private
+ */
+router.delete("/:id/variants", asyncHandler(deleteProductVariants));
 
 export default router;
