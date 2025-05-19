@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -20,17 +21,19 @@ const products = [
   // Add more products...
 ];
 
+
 export default function ProductosAdmin() {
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold font-playfair">Gestión de Productos</h1>
-        <Button className="btn-gold">
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Producto
-        </Button>
+    <Button className="btn-gold" onClick={() => router.push("/admin/nuevo-producto")}>
+      <Plus className="mr-2 h-4 w-4" />
+      Nuevo Producto
+    </Button>
       </div>
 
       <Card className="p-6">
