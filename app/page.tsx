@@ -6,6 +6,7 @@ import Testimonials from '@/components/home/testimonials';
 import Newsletter from '@/components/home/newsletter';
 
 export default function Home() {
+
   return (
     <>
       <HeroSection />
