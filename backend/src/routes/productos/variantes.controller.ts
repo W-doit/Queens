@@ -7,6 +7,8 @@ import {
   handleSizeVariants,
   handleColorVariants,
   generateVariantCombinations,
+  setVariantBarcodes,
+  fixVariantNames,
 } from "../../services/productos.service";
 
 /**
@@ -227,134 +229,332 @@ export const getProductVariants = async (req: Request, res: Response) => {
 };
 
 /**
- * Update variant attributes (sizes, colors)
+ * Update product variants for a specific product
  */
 export const updateProductVariants = async (req: Request, res: Response) => {
   try {
     const productId = parseInt(req.params.id);
-    const { sizes, colors } = req.body;
+    const { sizes = [], colors = [], otherAttributes = [] } = req.body;
 
-    // Validate request
-    if (!sizes && !colors) {
+    // Input validation
+    if (!productId || isNaN(productId)) {
       return res.status(400).json({
-        error: "At least one attribute (sizes or colors) must be provided",
+        error: "Invalid product ID",
+        message: "Product ID must be a valid number",
       });
     }
 
-    // Check if product exists
+    // Check that the product exists
     const products = await callOdoo<any[]>(
       "product.template",
       "search_read",
       [[["id", "=", productId]]],
-      { fields: ["id"] }
+      { fields: ["id", "name"] }
     );
 
     if (!products || products.length === 0) {
-      return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({
+        error: "Product not found",
+        message: `No product found with ID ${productId}`,
+      });
     }
 
-    // Process sizes if provided
-    if (sizes && Array.isArray(sizes) && sizes.length > 0) {
-      await handleSizeVariants(productId, sizes);
-    }
+    // Prepare attribute data
+    const attributesList = [];
 
-    // Process colors if provided
-    if (colors && Array.isArray(colors) && colors.length > 0) {
-      await handleColorVariants(productId, colors);
-    }
-
-    // Force generation of variant products after setting attributes
-    try {
-      console.log("Attempting to generate variants for product", productId);
-
-      // First try the direct method if available
-      try {
-        await callOdoo("product.template", "create_variant_ids", [[productId]]);
-        console.log("Variants generated using create_variant_ids method");
-      } catch (variantError) {
-        console.log(
-          "create_variant_ids not available, trying alternative approaches"
-        );
-
-        // Alternative approach: trigger a product update to force variant generation
-        await callOdoo("product.template", "write", [
-          [productId],
-          { active: true },
-        ]);
-
-        // Try to set create_variant to "always"
-        try {
-          await callOdoo("product.template", "write", [
-            [productId],
-            { create_variant: "always" },
-          ]);
-          console.log("Set create_variant to always");
-        } catch (err) {
-          console.log("Could not set create_variant flag, continuing...");
-        }
-
-        // Some versions need a call to this method
-        try {
-          await callOdoo("product.template", "_create_variant_ids", [
-            [productId],
-          ]);
-          console.log("Variants generated using _create_variant_ids method");
-        } catch (innerError) {
-          console.log(
-            "_create_variant_ids not available, using standard update"
-          );
-          // The write operation should have triggered the variant generation
-        }
-      }
-
-      // Additional attempt: use action_create_variant if available
-      try {
-        await callOdoo("product.template", "action_create_variant", [
-          [productId],
-        ]);
-        console.log("Variants generated using action_create_variant method");
-      } catch (actionError) {
-        console.log("action_create_variant not available, continuing...");
-      }
-
-      // Give Odoo a moment to process the variants
-      console.log("Waiting for Odoo to process variants...");
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      // Check if variants were actually generated
-      const generatedVariants = await callOdoo(
-        "product.product",
+    // Add size attribute if sizes are provided
+    if (sizes && sizes.length > 0) {
+      // Look up the size attribute ID
+      const sizeAttributes = await callOdoo<any[]>(
+        "product.attribute",
         "search_read",
-        [[["product_tmpl_id", "=", productId]]],
+        [[["name", "=", "Size"]]],
         { fields: ["id", "name"] }
       );
 
-      console.log(
-        `Found ${generatedVariants?.length || 0} variants after generation:`,
-        generatedVariants?.map((v: any) => ({ id: v.id, name: v.name }))
+      let sizeAttributeId;
+
+      if (sizeAttributes && sizeAttributes.length > 0) {
+        sizeAttributeId = sizeAttributes[0].id;
+      } else {
+        // Create size attribute if it doesn't exist
+        sizeAttributeId = await callOdoo("product.attribute", "create", [
+          { name: "Size", create_variant: "always" },
+        ]);
+      }
+
+      // Create size values if they don't exist
+      const sizeValues = [];
+      for (const size of sizes) {
+        const existingValues = await callOdoo<any[]>(
+          "product.attribute.value",
+          "search_read",
+          [
+            [
+              ["name", "=", size],
+              ["attribute_id", "=", sizeAttributeId],
+            ],
+          ],
+          { fields: ["id", "name"] }
+        );
+
+        if (existingValues && existingValues.length > 0) {
+          sizeValues.push(existingValues[0].id);
+        } else {
+          const newValueId = await callOdoo(
+            "product.attribute.value",
+            "create",
+            [{ name: size, attribute_id: sizeAttributeId }]
+          );
+          sizeValues.push(newValueId);
+        }
+      }
+
+      attributesList.push({
+        attribute_id: sizeAttributeId,
+        value_ids: sizeValues,
+      });
+    }
+
+    // Add color attribute if colors are provided
+    if (colors && colors.length > 0) {
+      // Look up the color attribute ID
+      const colorAttributes = await callOdoo<any[]>(
+        "product.attribute",
+        "search_read",
+        [[["name", "=", "Color"]]],
+        { fields: ["id", "name"] }
       );
+
+      let colorAttributeId;
+
+      if (colorAttributes && colorAttributes.length > 0) {
+        colorAttributeId = colorAttributes[0].id;
+      } else {
+        // Create color attribute if it doesn't exist
+        colorAttributeId = await callOdoo("product.attribute", "create", [
+          { name: "Color", create_variant: "always" },
+        ]);
+      }
+
+      // Create color values if they don't exist
+      const colorValues = [];
+      for (const color of colors) {
+        const existingValues = await callOdoo<any[]>(
+          "product.attribute.value",
+          "search_read",
+          [
+            [
+              ["name", "=", color],
+              ["attribute_id", "=", colorAttributeId],
+            ],
+          ],
+          { fields: ["id", "name"] }
+        );
+
+        if (existingValues && existingValues.length > 0) {
+          colorValues.push(existingValues[0].id);
+        } else {
+          const newValueId = await callOdoo(
+            "product.attribute.value",
+            "create",
+            [{ name: color, attribute_id: colorAttributeId }]
+          );
+          colorValues.push(newValueId);
+        }
+      }
+
+      attributesList.push({
+        attribute_id: colorAttributeId,
+        value_ids: colorValues,
+      });
+    }
+
+    // Add other attributes if provided
+    if (otherAttributes && otherAttributes.length > 0) {
+      for (const attr of otherAttributes) {
+        if (!attr.name || !attr.values || !Array.isArray(attr.values)) {
+          continue;
+        }
+
+        // Look up the attribute ID
+        const existingAttrs = await callOdoo<any[]>(
+          "product.attribute",
+          "search_read",
+          [[["name", "=", attr.name]]],
+          { fields: ["id", "name"] }
+        );
+
+        let attrId;
+
+        if (existingAttrs && existingAttrs.length > 0) {
+          attrId = existingAttrs[0].id;
+        } else {
+          // Create attribute if it doesn't exist
+          attrId = await callOdoo("product.attribute", "create", [
+            { name: attr.name, create_variant: "always" },
+          ]);
+        }
+
+        // Create attribute values if they don't exist
+        const attrValues = [];
+        for (const value of attr.values) {
+          const existingValues = await callOdoo<any[]>(
+            "product.attribute.value",
+            "search_read",
+            [
+              [
+                ["name", "=", value],
+                ["attribute_id", "=", attrId],
+              ],
+            ],
+            { fields: ["id", "name"] }
+          );
+
+          if (existingValues && existingValues.length > 0) {
+            attrValues.push(existingValues[0].id);
+          } else {
+            const newValueId = await callOdoo(
+              "product.attribute.value",
+              "create",
+              [{ name: value, attribute_id: attrId }]
+            );
+            attrValues.push(newValueId);
+          }
+        }
+
+        attributesList.push({
+          attribute_id: attrId,
+          value_ids: attrValues,
+        });
+      }
+    }
+
+    // If we have attributes to add, update the product
+    if (attributesList.length > 0) {
+      // Create attribute lines
+      for (const attrData of attributesList) {
+        // Check if attribute line already exists for this attribute
+        const existingLines = await callOdoo<any[]>(
+          "product.template.attribute.line",
+          "search_read",
+          [
+            [
+              ["product_tmpl_id", "=", productId],
+              ["attribute_id", "=", attrData.attribute_id],
+            ],
+          ],
+          { fields: ["id"] }
+        );
+
+        if (existingLines && existingLines.length > 0) {
+          // Update existing attribute line
+          await callOdoo("product.template.attribute.line", "write", [
+            [existingLines[0].id],
+            { value_ids: [[6, 0, attrData.value_ids]] },
+          ]);
+        } else {
+          // Create new attribute line
+          await callOdoo("product.template.attribute.line", "create", [
+            {
+              product_tmpl_id: productId,
+              attribute_id: attrData.attribute_id,
+              value_ids: [[6, 0, attrData.value_ids]],
+            },
+          ]);
+        }
+      }
+    }
+
+    // Try to generate variants if needed
+    try {
+      await callOdoo("product.template", "create_variant_ids", [[productId]]);
+      console.log("Variants created successfully");
     } catch (variantGenError) {
       console.error("Error generating variants:", variantGenError);
       // Continue anyway as the attributes were set successfully
     }
 
-    // If we got here, the attributes were successfully set
-    res.json({
-      message: "Product variants updated successfully",
+    // Wait a moment for variants to be fully created
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Get all variants to set barcodes and fix names
+    const variants = await callOdoo<ProductVariant[]>(
+      "product.product",
+      "search_read",
+      [[["product_tmpl_id", "=", productId]]],
+      {
+        fields: [
+          "id",
+          "name",
+          "barcode",
+          "product_template_attribute_value_ids",
+          "display_name",
+        ],
+      }
+    );
+
+    console.log(`Found ${variants?.length || 0} variants to process`);
+
+    // Process each variant to ensure barcode and name are correct
+    if (variants && variants.length > 0) {
+      console.log(
+        `Processing ${variants.length} variants to update barcodes and names`
+      );
+
+      // First, set barcodes for variants without them
+      try {
+        const barcodeResults = await setVariantBarcodes(variants, productId);
+        console.log(`Updated barcodes for ${barcodeResults.length} variants`);
+      } catch (barcodeError) {
+        console.error("Error setting variant barcodes:", barcodeError);
+      }
+
+      // Then fix variant names
+      try {
+        const nameResults = await fixVariantNames(variants, products[0].name);
+        console.log(`Updated names for ${nameResults.length} variants`);
+      } catch (nameError) {
+        console.error("Error fixing variant names:", nameError);
+      }
+
+      // Get updated variants
+      const updatedVariants = await callOdoo<ProductVariant[]>(
+        "product.product",
+        "search_read",
+        [[["product_tmpl_id", "=", productId]]],
+        {
+          fields: ["id", "name", "barcode"],
+        }
+      );
+
+      // Response with updated variants info
+      return res.json({
+        message: "Product variants updated successfully",
+        product_id: productId,
+        variants_updated: updatedVariants.length,
+        variants: updatedVariants.map((v) => ({
+          id: v.id,
+          name: v.name,
+          barcode: v.barcode,
+        })),
+      });
+    }
+
+    // If we got here, the attributes were successfully set but no variants were processed
+    return res.json({
+      message: "Product attributes updated successfully",
       product_id: productId,
+      variants_updated: 0,
     });
   } catch (error: any) {
     console.error("Error updating product variants:", error);
-    res.status(500).json({
+    return res.status(500).json({
       error: "Failed to update product variants",
-      message: error.message,
+      message: error.message || "An unexpected error occurred",
     });
   }
 };
-
-/**
- * Update stock quantity for a specific product variant
- */
 /**
  * Update stock quantity for a specific product variant
  */

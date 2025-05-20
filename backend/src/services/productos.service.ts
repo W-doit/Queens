@@ -299,3 +299,100 @@ export async function generateVariantCombinations(productId: number) {
     return false;
   }
 }
+
+// Add this new function to the file:
+
+/**
+ * Generate and set barcodes for product variants
+ */
+export async function setVariantBarcodes(variants: any[], productId: number) {
+  if (!variants || !Array.isArray(variants) || variants.length === 0) {
+    return [];
+  }
+
+  const updatedVariants = [];
+
+  for (const variant of variants) {
+    if (!variant.barcode) {
+      try {
+        // Generate a unique barcode
+        const timestamp = Date.now().toString().slice(-6);
+        const barcode = `P${productId}V${variant.id}${timestamp}`;
+
+        // Update the variant with the new barcode
+        await callOdoo("product.product", "write", [
+          [variant.id],
+          { barcode: barcode },
+        ]);
+
+        updatedVariants.push({
+          id: variant.id,
+          name: variant.name,
+          barcode: barcode,
+        });
+      } catch (error) {
+        console.error(
+          `Error setting barcode for variant ${variant.id}:`,
+          error
+        );
+      }
+    }
+  }
+
+  return updatedVariants;
+}
+
+/**
+ * Fix variant names to properly include attribute values
+ */
+export async function fixVariantNames(variants: any[], productName: string) {
+  if (!variants || !Array.isArray(variants) || variants.length === 0) {
+    return [];
+  }
+
+  const updatedVariants = [];
+
+  for (const variant of variants) {
+    if (
+      !variant.product_template_attribute_value_ids ||
+      variant.product_template_attribute_value_ids.length === 0
+    ) {
+      continue;
+    }
+
+    try {
+      // Get attribute values for better naming
+      const attrValues = await callOdoo<any[]>(
+        "product.template.attribute.value",
+        "read",
+        [variant.product_template_attribute_value_ids],
+        { fields: ["id", "name", "attribute_id"] }
+      );
+
+      // Build attribute part of name
+      const attrNames = attrValues
+        .map((attr) => attr.name)
+        .filter((name) => name);
+
+      if (attrNames.length > 0) {
+        const newName = `${productName} - ${attrNames.join(" - ")}`;
+
+        if (newName !== variant.name) {
+          await callOdoo("product.product", "write", [
+            [variant.id],
+            { name: newName },
+          ]);
+
+          updatedVariants.push({
+            id: variant.id,
+            name: newName,
+          });
+        }
+      }
+    } catch (error) {
+      console.error(`Error fixing name for variant ${variant.id}:`, error);
+    }
+  }
+
+  return updatedVariants;
+}

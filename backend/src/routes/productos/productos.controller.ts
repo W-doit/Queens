@@ -18,139 +18,149 @@ import {
 } from "../../services/productos.service";
 
 /**
- * Get products with pagination, filtering, and sorting
+ * Get all products with pagination, filtering, and sorting
  */
 export const getProducts = async (req: Request, res: Response) => {
-  // Extract query parameters with defaults
-  const limit = parseInt(req.query.limit as string) || 10;
-  const offset = parseInt(req.query.offset as string) || 0;
-  const category = req.query.category
-    ? parseInt(req.query.category as string)
-    : undefined;
-  const sort = (req.query.sort as string) || "name";
+  try {
+    // Extract pagination parameters
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = (page - 1) * limit;
 
-  console.log(
-    `GET products with limit=${limit}, offset=${offset}, category=${category}, sort=${sort}`
-  );
+    // Extract filtering and sorting parameters
+    const category = req.query.category
+      ? parseInt(req.query.category as string)
+      : undefined;
+    const search = req.query.search as string;
+    const sortBy = (req.query.sortBy as string) || "name";
+    const sortOrder = (req.query.sortOrder as string) || "asc";
 
-  // Build domain filter
-  const domain: any[] = [];
-  if (category) {
-    domain.push(["categ_id", "=", category]);
-  }
+    // Build domain for filtering
+    let domain: any[] = [["sale_ok", "=", true]];
 
-  // Build sort order
-  let order = "name ASC";
-  if (sort === "newest") {
-    order = "id DESC";
-  } else if (sort === "price_low") {
-    order = "list_price ASC";
-  } else if (sort === "price_high") {
-    order = "list_price DESC";
-  }
-
-  // Get products from Odoo with sorting
-  const products = await callOdoo<ProductTemplate[]>(
-    "product.template",
-    "search_read",
-    [domain],
-    {
-      fields: [
-        "id",
-        "name",
-        "list_price",
-        "type",
-        "barcode",
-        "image_1920",
-        "categ_id",
-        "qty_available",
-        "default_code",
-        "product_variant_ids",
-        "attribute_line_ids",
-      ],
-      limit,
-      offset,
-      order,
+    if (category) {
+      domain.push(["categ_id", "=", category]);
     }
-  );
 
-  console.log(`Found ${products.length} products`);
+    if (search) {
+      domain.push(["name", "ilike", search]);
+    }
 
-  // Get total count for pagination
-  const total = await callOdoo<number>("product.template", "search_count", [
-    domain,
-  ]);
+    // Get total count
+    const count = await callOdoo<number>("product.template", "search_count", [
+      domain,
+    ]);
 
-  // Process and format each product
-  const formattedProducts: ProductResponse[] = await Promise.all(
-    products.map(async (product) => {
-      // Get size variants if available
-      let sizes: SizeInfo[] = [];
-
-      if (
-        product.product_variant_ids &&
-        product.product_variant_ids.length > 1
-      ) {
-        // Fetch variants to get size information
-        const variants = await callOdoo<ProductVariant[]>(
-          "product.product",
-          "search_read",
-          [["product_tmpl_id", "=", product.id]],
-          {
-            fields: [
-              "id",
-              "name",
-              "product_template_attribute_value_ids",
-              "qty_available",
-              "barcode",
-            ],
-          }
-        );
-
-        // Extract size info from variants
-        sizes = variants.map((variant) => {
-          // Extract size from variant name
-          const nameParts = variant.name.split(" - ");
-          const sizeName =
-            nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
-
-          return {
-            id: variant.id,
-            name: sizeName,
-            product_id: variant.id,
-            qty_available: variant.qty_available,
-            barcode: variant.barcode,
-          };
-        });
+    // Get products
+    const products = await callOdoo<any[]>(
+      "product.template",
+      "search_read",
+      [domain],
+      {
+        fields: [
+          "id",
+          "name",
+          "list_price",
+          "type",
+          "barcode",
+          "categ_id",
+          "image_1920",
+          "qty_available",
+          "default_code",
+          "product_variant_ids",
+        ],
+        limit: limit,
+        offset: offset,
+        order: `${sortBy} ${sortOrder}`,
       }
+    );
 
-      // Format the response
-      return {
-        id: product.id,
-        name: product.name,
-        list_price: product.list_price,
-        type: product.type,
-        barcode: product.barcode,
-        categ_id: product.categ_id,
-        image_url: product.image_1920
-          ? `/api/products/${product.id}/image`
-          : undefined,
-        qty_available: product.qty_available,
-        default_code: product.default_code,
-        sizes: sizes.length > 0 ? sizes : undefined,
-      };
-    })
-  );
+    console.log(`Found ${products?.length || 0} products`);
 
-  // Create the response object
-  const response: ProductListResponse = {
-    products: formattedProducts,
-    total,
-    page: Math.floor(offset / limit) + 1,
-    limit,
-  };
+    // Process products with Promise.all to handle async operations in map
+    const formattedProducts =
+      products && Array.isArray(products)
+        ? await Promise.all(
+            products.map(async (product) => {
+              // Get size variants if available
+              let sizes: SizeInfo[] = [];
 
-  res.json(response);
+              if (
+                product.product_variant_ids &&
+                product.product_variant_ids.length > 1
+              ) {
+                // Fetch variants to get size information
+                const variants = await callOdoo<ProductVariant[]>(
+                  "product.product",
+                  "search_read",
+                  [[["product_tmpl_id", "=", product.id]]],
+                  {
+                    fields: [
+                      "id",
+                      "name",
+                      "product_template_attribute_value_ids",
+                      "qty_available",
+                      "barcode",
+                    ],
+                  }
+                );
+
+                if (variants && Array.isArray(variants)) {
+                  // Extract size info from variants
+                  sizes = variants.map((variant) => {
+                    // Extract size from variant name
+                    const nameParts = variant.name.split(" - ");
+                    const sizeName =
+                      nameParts.length > 1
+                        ? nameParts[nameParts.length - 1]
+                        : "";
+
+                    return {
+                      id: variant.id,
+                      name: sizeName,
+                      product_id: variant.id,
+                      qty_available: variant.qty_available,
+                      barcode: variant.barcode,
+                    };
+                  });
+                }
+              }
+
+              // Format the response
+              return {
+                id: product.id,
+                name: product.name,
+                list_price: product.list_price,
+                type: product.type,
+                barcode: product.barcode,
+                categ_id: product.categ_id,
+                image_url: product.image_1920
+                  ? `/api/products/${product.id}/image`
+                  : undefined,
+                qty_available: product.qty_available,
+                default_code: product.default_code,
+                sizes: sizes.length > 0 ? sizes : undefined,
+              };
+            })
+          )
+        : [];
+
+    // Create the response object
+    const response: ProductListResponse = {
+      products: formattedProducts,
+      total: count || 0,
+      page: Math.floor(offset / limit) + 1,
+      limit,
+    };
+
+    res.json(response);
+  } catch (error: any) {
+    // Add explicit type annotation here
+    console.error("Error fetching products:", error);
+    res
+      .status(500)
+      .json({ error: error.message || "Failed to fetch products" });
+  }
 };
 
 /**
@@ -432,4 +442,3 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
-
