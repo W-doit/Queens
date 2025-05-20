@@ -785,3 +785,383 @@ export const confirmOrder = async (req: Request, res: Response) => {
     });
   }
 };
+
+/**
+ * Simplified debug endpoint for stock processing
+ */
+export const debugStockProcessing = async (req: Request, res: Response) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    console.log(`DEBUG: Processing stock movements for order ${orderId}...`);
+
+    // 1. Get the order
+    const orders = await callOdoo<any[]>(
+      "pos.order",
+      "search_read",
+      [[["id", "=", orderId]]],
+      { fields: ["id", "name", "state", "session_id", "lines"] }
+    );
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        error: "Order not found",
+        message: `Order with ID ${orderId} not found`,
+      });
+    }
+
+    const order = orders[0];
+    console.log("DEBUG: Found order:", order);
+
+    // 2. Get the order lines to identify products
+    const lineIds = order.lines || [];
+
+    if (!lineIds || lineIds.length === 0) {
+      return res.json({
+        error: "No order lines",
+        message: "Order doesn't contain any products",
+        order: order,
+      });
+    }
+
+    console.log("DEBUG: Found line IDs:", lineIds);
+
+    const orderLines = await callOdoo<any[]>(
+      "pos.order.line",
+      "search_read",
+      [[["id", "in", lineIds]]],
+      { fields: ["id", "product_id", "qty", "price_unit"] }
+    );
+
+    console.log("DEBUG: Order lines:", orderLines);
+
+    // 3. Check if stock moves were created for this order
+    // In Odoo 16, POS orders might use stock.move directly without picking
+    const productIds = orderLines.map((line) => line.product_id[0]);
+
+    // Search for stock moves related to these products around this order time
+    const stockMoves = await callOdoo<any[]>(
+      "stock.move",
+      "search_read",
+      [
+        [
+          ["product_id", "in", productIds],
+          ["origin", "ilike", order.name],
+        ],
+      ],
+      {
+        fields: [
+          "id",
+          "name",
+          "product_id",
+          "product_uom_qty",
+          "quantity_done",
+          "state",
+          "origin",
+        ],
+      }
+    );
+
+    console.log("DEBUG: Stock moves by origin:", stockMoves);
+
+    // 4. Try alternative ways to find stock movements
+    let pickingIds: number[] = [];
+
+    // Search for stock pickings with this order name
+    const pickings = await callOdoo<any[]>(
+      "stock.picking",
+      "search_read",
+      [[["origin", "ilike", order.name]]],
+      { fields: ["id", "name", "state", "move_lines", "origin"] }
+    );
+
+    if (pickings && pickings.length > 0) {
+      pickingIds = pickings.map((p) => p.id);
+      console.log("DEBUG: Found pickings by name:", pickingIds);
+    } else {
+      console.log("DEBUG: No pickings found by name search");
+    }
+
+    // 5. Try to create stock movements manually
+    let success = false;
+    let manualCreation = null;
+
+    if (stockMoves.length === 0 && pickings.length === 0) {
+      try {
+        console.log(
+          "DEBUG: No existing stock movements found, trying to create..."
+        );
+
+        // Try to call create_picking method directly
+        await callOdoo("pos.order", "create_picking", [[orderId]]);
+
+        // Check if it worked
+        const newPickings = await callOdoo<any[]>(
+          "stock.picking",
+          "search_read",
+          [[["origin", "ilike", order.name]]],
+          { fields: ["id", "name", "state"] }
+        );
+
+        if (newPickings && newPickings.length > 0) {
+          manualCreation = {
+            success: true,
+            pickings: newPickings,
+          };
+
+          // Process these pickings
+          for (const picking of newPickings) {
+            try {
+              // Confirm if needed
+              if (picking.state === "draft") {
+                await callOdoo("stock.picking", "action_confirm", [
+                  [picking.id],
+                ]);
+              }
+
+              // Assign
+              await callOdoo("stock.picking", "action_assign", [[picking.id]]);
+
+              // Get moves to set quantities
+              const moves = await callOdoo<any[]>(
+                "stock.move",
+                "search_read",
+                [[["picking_id", "=", picking.id]]],
+                { fields: ["id", "product_id", "product_uom_qty"] }
+              );
+
+              // Set quantities
+              for (const move of moves) {
+                await callOdoo("stock.move", "write", [
+                  [move.id],
+                  { quantity_done: move.product_uom_qty },
+                ]);
+              }
+
+              // Validate
+              try {
+                await callOdoo("stock.picking", "button_validate", [
+                  [picking.id],
+                ]);
+                success = true;
+              } catch (validateError: any) {
+                console.log("DEBUG: Validation error, trying wizard");
+
+                // Try with wizard
+                const wizardId = await callOdoo(
+                  "stock.immediate.transfer",
+                  "create",
+                  [
+                    {
+                      pick_ids: [[6, 0, [picking.id]]],
+                    },
+                  ]
+                );
+
+                await callOdoo("stock.immediate.transfer", "process", [
+                  [wizardId],
+                ]);
+                success = true;
+              }
+            } catch (processError: any) {
+              console.log(
+                `DEBUG: Error processing picking ${picking.id}:`,
+                processError.message
+              );
+            }
+          }
+        } else {
+          manualCreation = {
+            success: false,
+            message: "create_picking called but no new pickings found",
+          };
+        }
+      } catch (createError: any) {
+        manualCreation = {
+          success: false,
+          error: createError.message,
+        };
+        console.log("DEBUG: Error creating picking:", createError.message);
+      }
+    }
+
+    // 6. Check the stock levels for the products
+    const stockChecks = [];
+
+    for (const line of orderLines) {
+      try {
+        const productStock = await callOdoo<any[]>(
+          "product.product",
+          "read",
+          [[line.product_id[0]]],
+          { fields: ["id", "name", "qty_available", "virtual_available"] }
+        );
+
+        if (productStock && productStock.length > 0) {
+          stockChecks.push({
+            product_id: line.product_id[0],
+            product_name: line.product_id[1],
+            qty_ordered: line.qty,
+            qty_available: productStock[0].qty_available,
+            virtual_available: productStock[0].virtual_available,
+          });
+        }
+      } catch (error: any) {
+        console.log(
+          `DEBUG: Error checking stock for ${line.product_id[1]}:`,
+          error.message
+        );
+      }
+    }
+
+    // 7. If everything else failed, try direct stock adjustment
+    let directAdjustment = null;
+
+    if (!success && stockChecks.length > 0) {
+      try {
+        console.log("DEBUG: Attempting direct stock adjustment as fallback");
+
+        // Find the warehouse/location
+        const locations = await callOdoo<any[]>(
+          "stock.location",
+          "search_read",
+          [[["usage", "=", "internal"]]],
+          { fields: ["id", "name"], limit: 1 }
+        );
+
+        if (locations && locations.length > 0) {
+          const locationId = locations[0].id;
+
+          // Create inventory adjustment for each product
+          for (const line of orderLines) {
+            // Create inventory adjustment
+            try {
+              // Check if we need to use inventory.adjustment or stock.quant depending on Odoo version
+              let success = false;
+
+              // Try stock.quant method first (Odoo 16+)
+              try {
+                // Get current quants
+                const quants = await callOdoo<any[]>(
+                  "stock.quant",
+                  "search_read",
+                  [
+                    [
+                      ["product_id", "=", line.product_id[0]],
+                      ["location_id", "=", locationId],
+                    ],
+                  ],
+                  { fields: ["id", "quantity"] }
+                );
+
+                if (quants && quants.length > 0) {
+                  // Update existing quant
+                  const quantId = quants[0].id;
+                  const newQty = Math.max(0, quants[0].quantity - line.qty);
+
+                  await callOdoo("stock.quant", "write", [
+                    [quantId],
+                    { inventory_quantity: newQty },
+                  ]);
+
+                  await callOdoo("stock.quant", "action_apply_inventory", [
+                    [quantId],
+                  ]);
+                  success = true;
+                } else {
+                  // Create new quant with negative adjustment
+                  const quantId = await callOdoo("stock.quant", "create", [
+                    {
+                      product_id: line.product_id[0],
+                      location_id: locationId,
+                      inventory_quantity: -line.qty,
+                    },
+                  ]);
+
+                  await callOdoo("stock.quant", "action_apply_inventory", [
+                    [quantId],
+                  ]);
+                  success = true;
+                }
+              } catch (quantError: any) {
+                console.log(
+                  "DEBUG: Stock quant approach failed:",
+                  quantError.message
+                );
+              }
+
+              if (success) {
+                console.log(
+                  `DEBUG: Successfully adjusted stock for ${line.product_id[1]}`
+                );
+              }
+            } catch (adjustError: any) {
+              console.log(
+                `DEBUG: Error with inventory adjustment:`,
+                adjustError.message
+              );
+            }
+          }
+
+          // Check stock again after adjustment
+          const afterAdjustment = [];
+
+          for (const line of orderLines) {
+            const productStock = await callOdoo<any[]>(
+              "product.product",
+              "read",
+              [[line.product_id[0]]],
+              { fields: ["id", "name", "qty_available"] }
+            );
+
+            if (productStock && productStock.length > 0) {
+              afterAdjustment.push({
+                product_id: line.product_id[0],
+                product_name: line.product_id[1],
+                qty_available: productStock[0].qty_available,
+              });
+            }
+          }
+
+          directAdjustment = {
+            success: true,
+            after_adjustment: afterAdjustment,
+          };
+        } else {
+          directAdjustment = {
+            success: false,
+            message: "No internal location found",
+          };
+        }
+      } catch (directError: any) {
+        directAdjustment = {
+          success: false,
+          error: directError.message,
+        };
+        console.log("DEBUG: Direct adjustment error:", directError.message);
+      }
+    }
+
+    // 8. Return all the debugging information
+    return res.json({
+      order_id: orderId,
+      order_name: order.name,
+      order_state: order.state,
+      order_lines: orderLines,
+      stock_movements: {
+        stock_moves_found: stockMoves,
+        pickings_found: pickings,
+        manual_creation: manualCreation,
+        direct_adjustment: directAdjustment,
+      },
+      stock_levels: stockChecks,
+      stock_updated: success,
+    });
+  } catch (error: any) {
+    console.error("Error in debug endpoint:", error);
+    return res.status(500).json({
+      error: "Debug endpoint error",
+      message: error.message,
+    });
+  }
+};
