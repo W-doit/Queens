@@ -30,10 +30,10 @@ import {
 const navItems = [
   { name: "Inicio", href: "/" },
   { name: "Productos", href: "/productos" },
-  { name: "Categorías", href: "/categorias" },
+  { name: "Categorías", href: "/#categories" }, //go to categories section
   { name: "Vestidor Virtual", href: "/vestidor-virtual" },
   // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
-  { name: "Contacto", href: "/contacto" },
+  { name: "Contacto", href: "/#contacto" }, //go to contact section in newsletter route for the moment
 ];
 
 export default function Header() {
@@ -73,7 +73,7 @@ export default function Header() {
   };
 
   return (
-    <header
+        <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled ? "shadow-md py-2" : "py-4"
       }`}
@@ -82,27 +82,40 @@ export default function Header() {
           "linear-gradient(45deg, #000, rgba(0,0,0,0.95) 60%, hsl(41, 60%, 30%) 100%)",
       }}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          {/* Admin-header*/}
-              {/* logo */}
-              <div className="flex items-center"></div>
-              {/* Admin Name and photo */}
-              {isAdmin ? (
-              <div className="flex items-center space-x-4">
+      <div className="mx-auto px-4">
+        <div className="flex items-center justify-between w-full">
+          <div className="w-1/3" />
+
+          {/* Desktop navigation */}
+          {!isAdmin && (
+            <nav className="hidden md:flex justify-center items-center space-x-6 w-1/3">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    pathname === item.href ? "text-primary" : "text-white"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          )}
+
+          {/* Admin & Admin buttons */}
+          <div className="flex justify-end items-center space-x-4 w-1/3">
+            {isAdmin ? (
+              <>
                 <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden border border-white">
                   <User className="w-5 h-5 md:w-6 md:h-6 text-gray-600" />
                 </div>
-                  <h1 className="text-base md:text-lg font-light text-white whitespace-nowrap">
+                <h1 className="text-base md:text-lg font-light text-white whitespace-nowrap">
                   Bienvenido/a, {adminName}
                 </h1>
-
-                {/* Notification Button */}
                 <button className="p-2 rounded-full bg-primary/10 hover:bg-primary/20">
                   <Bell className="h-5 w-5 text-primary" />
                 </button>
-
-                {/* Logout Button */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -116,26 +129,9 @@ export default function Header() {
                     <TooltipContent side="top">Log out</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              </div>
-          ) : (
-            <>
-              {/* Desktop Navigation */}
-              <nav className="hidden md:flex items-center space-x-6">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`text-sm font-medium transition-colors hover:text-primary ${
-                      pathname === item.href ? "text-primary" : "text-white"
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-              </nav>
-
-              {/* Search, Cart, User - Desktop */}
-              <div className="hidden md:flex items-center space-x-4">
+              </>
+            ) : (
+              <>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -175,10 +171,10 @@ export default function Header() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </div>
-            </>
-          )}
+              </>
+            )}
           </div>
+        </div>
 
           {/* Mobile Menu Button */}
           {!isAdmin && (

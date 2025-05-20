@@ -126,8 +126,8 @@ export default function AdminLayout({
                     : "hover:bg-muted"
                 }`}
               >
-                <Settings size={20} />
-                <span>Ajustes</span>
+                {/* <Settings size={20} />
+                <span>Ajustes</span> */}
               </a>
             </div>
           
