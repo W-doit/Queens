@@ -137,3 +137,32 @@ export interface InventoryUpdateResponse {
   success: boolean;
   message: string;
 }
+
+// Product variant representation (expanded)
+export interface ProductVariant extends OdooModel {
+  name: string;
+  product_tmpl_id?: number[];
+  product_template_attribute_value_ids?: number[];
+  qty_available?: number;
+  barcode?: string | boolean;
+  display_name?: string;
+  virtual_available?: number;
+  incoming_qty?: number;
+  outgoing_qty?: number;
+  [key: string]: any;
+}
+
+// Variant update information
+export interface VariantUpdates {
+  name?: string;
+  barcode?: string;
+  [key: string]: any;
+}
+
+// Updated variant information
+export interface UpdatedVariant {
+  id: number;
+  updates?: string[];
+  name: string;
+  barcode?: string | boolean;
+}
