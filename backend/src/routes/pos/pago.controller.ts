@@ -5,7 +5,14 @@
 import { Request, Response } from "express";
 import { callOdoo } from "../../utils/odooClient";
 import { PaymentRequest } from "../../types/pos";
-import { getActiveSession, isOrderEditable } from "../../services/pos.service";
+
+// Add the import at the top
+import {
+  getActiveSession,
+  isOrderEditable,
+  processStockMovements,
+  processStockMovementsDirect,
+} from "../../services/pos.service";
 
 /**
  * Process payment for an order
@@ -41,14 +48,14 @@ export const processPayment = async (req: Request, res: Response) => {
     const order = orders[0];
 
     // Check if order is already paid
-    if (order.state === "paid") {
+    if (order.state === "paid" || order.state === "done") {
       return res.status(400).json({
         error: "Order already paid",
         message: "This order has already been paid",
       });
     }
 
-    // Check if payment amount is sufficient (with small tolerance for float precision)
+    // Check if payment amount is sufficient
     const paymentDifference = Math.abs(amount - order.amount_total);
     if (amount < order.amount_total && paymentDifference > 0.01) {
       return res.status(400).json({
@@ -57,7 +64,7 @@ export const processPayment = async (req: Request, res: Response) => {
       });
     }
 
-    // Get payment methods (case-insensitive)
+    // Get payment methods
     const paymentMethods = await callOdoo<any[]>(
       "pos.payment.method",
       "search_read",
@@ -66,7 +73,7 @@ export const processPayment = async (req: Request, res: Response) => {
     );
 
     if (!paymentMethods || paymentMethods.length === 0) {
-      // Get all available payment methods
+      // Get available methods for better error message
       const allMethods = await callOdoo<any[]>(
         "pos.payment.method",
         "search_read",
@@ -94,95 +101,62 @@ export const processPayment = async (req: Request, res: Response) => {
 
     // Create payment
     const paymentId = await callOdoo("pos.payment", "create", [paymentData]);
-
-    if (!paymentId) {
-      return res.status(500).json({
-        error: "Failed to create payment",
-        message: "Could not create payment record",
-      });
-    }
-
     console.log("Payment created with ID:", paymentId);
 
+    // Mark order as paid
+    await callOdoo("pos.order", "write", [
+      [orderId],
+      {
+        state: "paid",
+        amount_paid: amount,
+        amount_return:
+          amount - order.amount_total > 0 ? amount - order.amount_total : 0,
+      },
+    ]);
+
+    console.log("Updated order state to paid");
+
+    // Process payment in Odoo
     try {
-      // Try using the write method to set state to 'paid'
-      await callOdoo("pos.order", "write", [
-        [orderId],
-        {
-          state: "paid",
-          amount_paid: amount,
-          amount_return:
-            amount - order.amount_total > 0 ? amount - order.amount_total : 0,
-        },
-      ]);
-
-      console.log("Updated order state to paid");
-
-      // Try calling the action to finalize the order
       await callOdoo("pos.order", "action_pos_order_paid", [[orderId]]);
       console.log("Called action_pos_order_paid");
-    } catch (actionError) {
-      console.error("Error setting order to paid state:", actionError);
-      // Continue anyway as we'll check the state next
+    } catch (actionError: any) {
+      console.warn("Error calling action_pos_order_paid:", actionError.message);
+      // Continue anyway as this is not critical
     }
 
-    // After successfully marking the order as paid, handle stock movements
+    // Process stock movements with both approaches
+    let stockProcessed = false;
+
+    // First try the standard approach
     try {
-      console.log(`Processing stock movements for order ${orderId}...`);
-
-      // Method 1: Try to create the picking (stock move)
-      await callOdoo("pos.order", "create_picking", [[orderId]]);
-      console.log("Created picking for order");
-
-      // Get updated order with picking information
-      const orderWithPicking = await callOdoo<any[]>(
-        "pos.order",
-        "search_read",
-        [[["id", "=", orderId]]],
-        { fields: ["id", "name", "state", "picking_id"] }
-      );
-
-      // If picking was created, try to process it immediately
-      if (orderWithPicking[0].picking_id) {
-        const pickingId = orderWithPicking[0].picking_id[0];
-        console.log(`Processing picking ID: ${pickingId}`);
-
-        try {
-          // Confirm and process the picking
-          await callOdoo("stock.picking", "action_confirm", [[pickingId]]);
-          console.log("Picking confirmed");
-
-          await callOdoo("stock.picking", "action_assign", [[pickingId]]);
-          console.log("Picking assigned");
-
-          await callOdoo("stock.picking", "button_validate", [[pickingId]]);
-          console.log("Picking validated successfully");
-        } catch (pickingError) {
-          console.warn("Error processing stock picking:", pickingError);
-        }
-      }
-
-      // Method 3: Try finalizing the order
-      try {
-        await callOdoo("pos.order", "action_pos_order_done", [[orderId]]);
-        console.log("Finalized order");
-      } catch (doneError) {
-        console.warn("action_pos_order_done failed:", doneError);
-      }
-    } catch (stockError) {
-      console.warn("Error processing stock movements:", stockError);
-      // Continue anyway - payment was successful
+      console.log("Attempting standard stock movement processing...");
+      stockProcessed = await processStockMovements(orderId);
+    } catch (stockError: any) {
+      console.warn("Standard stock processing failed:", stockError.message);
     }
 
-    // Additional update to ensure order is properly marked as processed
+    // If standard approach failed, use direct adjustment
+    if (!stockProcessed) {
+      console.log("Falling back to direct stock adjustment...");
+      stockProcessed = await processStockMovementsDirect(orderId);
+    }
+
+    console.log(
+      `Stock movements processed: ${
+        stockProcessed ? "Successfully" : "With issues"
+      }`
+    );
+
+    // Mark the order as done if needed
     try {
       await callOdoo("pos.order", "write", [[orderId], { state: "done" }]);
-      console.log("Order marked as done");
-    } catch (writeError) {
-      console.warn("Error setting order state to 'done':", writeError);
+      console.log("Marked order as done");
+    } catch (stateError: any) {
+      console.warn("Error setting order to done state:", stateError.message);
     }
 
-    // Get updated order
+    // Get updated order details
     const updatedOrders = await callOdoo<any[]>(
       "pos.order",
       "search_read",
@@ -197,27 +171,14 @@ export const processPayment = async (req: Request, res: Response) => {
       });
     }
 
-    const updatedOrder = updatedOrders[0];
-
-    // Check if order state was updated
-    if (updatedOrder.state !== "paid" && updatedOrder.state !== "done") {
-      console.warn(
-        "Order state is still not 'paid' or 'done', forcing state update"
-      );
-
-      // Force state update as a fallback
-      try {
-        await callOdoo("pos.order", "write", [[orderId], { state: "paid" }]);
-        updatedOrder.state = "paid";
-      } catch (writeError) {
-        console.error("Failed to force order state:", writeError);
-      }
-    }
-
+    // Respond with updated order information
     return res.json({
       success: true,
-      order: updatedOrder,
-      message: "Payment processed successfully",
+      order: updatedOrders[0],
+      stock_updated: stockProcessed,
+      message:
+        "Payment processed successfully" +
+        (stockProcessed ? "" : " (stock update pending)"),
     });
   } catch (error: any) {
     console.error("Error processing payment:", error);

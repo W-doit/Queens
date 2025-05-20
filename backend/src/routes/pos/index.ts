@@ -6,6 +6,7 @@ import * as SessionController from "./session.controller";
 import * as VentasController from "./ventas.controller";
 import * as PagoController from "./pago.controller";
 import * as ReceiptController from "./receipt.controller";
+import { debugStockProcessing } from "./ventas.controller";
 
 const router = express.Router();
 
@@ -63,5 +64,7 @@ router.post(
 );
 
 router.post("/orders/:id/confirm", asyncHandler(VentasController.confirmOrder));
+
+router.post("/orders/:id/debug-stock", asyncHandler(debugStockProcessing));
 
 export default router;
