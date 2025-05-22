@@ -2,6 +2,9 @@
 
 A modern e-commerce platform built with Next.js 13, featuring a virtual fitting room, admin dashboard, and responsive design.
 
+## Deployment
+The app is deployed on netifly at https://queensfashion.netlify.app/
+
 ## Tech Stack
 
 - **Framework:** Next.js 13.5
