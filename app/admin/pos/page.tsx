@@ -112,13 +112,6 @@ export default function POSPage() {
     0
   );
 
-  // const handleCalculateChange = () => {
-  //   const given = parseFloat(amountGiven.replace(",", "."));
-  //   if (!isNaN(given)) {
-  //     setChange(given - total);
-  //   }
-  // };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       {/* Productos */}
@@ -167,7 +160,6 @@ export default function POSPage() {
           <Card className="mt-6 p-4">
             <div className="flex flex-col md:flex-row md:items-end gap-4">
               <div>
-                <div>
                   <label className="block text-sm font-bold mb-1">Seleccionar talla</label>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -190,7 +182,6 @@ export default function POSPage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </div>
               <div>
                 <label className="block text-sm font-bold mb-1">Cantidad</label>
                 <div className="flex">
@@ -215,17 +206,18 @@ export default function POSPage() {
                   placeholder="0"
                 />
               </div>
-                     <div className="flex justify-end mt-4">
-                 <Button
-                className="mt-4 md:mt-0"
-                disabled={!selectedSize || !inputValue}
-                onClick={handleAddToCart}
-              >
-                Añadir
-              </Button>
+                    <div className="flex md:block justify-end md:justify-end items-end md:items-end w-full md:w-auto">
+        <Button
+          className="self-end"
+          disabled={!selectedSize || !inputValue}
+          onClick={handleAddToCart}
+        >
+          Añadir
+        </Button>
+      </div>
               </div>
-            </div>
-   
+          
+            
           </Card>
         )}
       </div>
@@ -281,45 +273,8 @@ export default function POSPage() {
               </div>
               <Button className="w-full mt-4 btn-gold">Cobrar</Button>
             </div>
+         
           )}
-
-          {/* change calculator*/}
-          {/* <div className="mt-8">
-            <h3 className="font-semibold mb-2">Pago</h3>
-            <div className="flex mb-2">
-              <input
-                type="text"
-                className="border rounded px-2 py-1 w-full text-right font-mono"
-                value={amountGiven}
-                readOnly
-                placeholder="Cantidad entregada"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-2 mb-2">
-              {[1,2,3,4,5,6,7,8,9,0].map((n) => (
-                <Button
-                  key={n}
-                  variant="outline"
-                  onClick={() => handleAmountClick(n.toString())}
-                  className="font-bold"
-                >
-                  {n}
-                </Button>
-              ))}
-              <Button variant="outline" onClick={() => handleAmountClick(".")}>.</Button>
-              <Button variant="outline" onClick={handleAmountClear}>C</Button>
-            </div>
-            <Button className="w-full mb-2" onClick={handleCalculateChange}>
-              Calcular cambio
-            </Button>
-            {change !== null && (
-              <div className={`text-lg font-bold ${change < 0 ? "text-red-500" : "text-green-600"}`}>
-                {change < 0
-                  ? `Faltan €${Math.abs(change).toFixed(2)}`
-                  : `Cambio: €${change.toFixed(2)}`}
-              </div>
-            )}
-          </div> */}
         </Card>
       </div>
     </div>

@@ -49,8 +49,7 @@ export default function HeroSection() {
               ${isVisible ? "animate-fade-in" : "opacity-0"}`}
             style={{ transitionDelay: "200ms" }}
           >
-            <span>Corona tu </span>
-            <span className="gold-text">estilo</span>
+            <span className="gold-text">Corona tu estilo </span>
           </h1>
 
           <p
