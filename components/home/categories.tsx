@@ -10,13 +10,13 @@ const categories = [
   {
     id: 1,
     name: "Vestidos",
-    image: "https://images.pexels.com/photos/6710788/pexels-photo-6710788.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    image:"https://images.pexels.com/photos/32074735/pexels-photo-32074735.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     count: 42,
   },
   {
     id: 2,
     name: "Blusas",
-    image: "https://images.pexels.com/photos/7691168/pexels-photo-7691168.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    image: "https://images.pexels.com/photos/1844132/pexels-photo-1844132.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     count: 38,
   },
   {
@@ -58,7 +58,7 @@ export default function Categories() {
   }, []);
 
   return (
-    <section className="bg-black text-white py-16">
+    <section id="categories" className="bg-black text-white py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 font-playfair">
