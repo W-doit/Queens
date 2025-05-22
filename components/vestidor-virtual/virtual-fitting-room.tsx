@@ -214,12 +214,14 @@ export default function VirtualFittingRoom() {
                     Vista previa simulada - En una implementación real, se mostraría la prenda superpuesta en tu imagen usando IA.
                   </p>
                 </div>
-                <Image
-                  src={uploadedImage}
-                  alt="Resultado"
-                  fill
-                  className="object-contain opacity-80"
-                />
+           {uploadedImage && (
+  <Image
+    src={uploadedImage}
+    alt="Resultado"
+    fill
+    className="object-contain opacity-80"
+  />
+)}
               </div>
               <div className="flex space-x-2">
                 <Button 
