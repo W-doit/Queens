@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import ComingSoon from "./comingsoon";
 
 export default function VirtualFittingCta() {
   const [isVisible, setIsVisible] = useState(false);
@@ -91,11 +92,12 @@ export default function VirtualFittingCta() {
                 </p>
               </li>
             </ul>
-            <Button asChild size="lg" className="btn-gold">
+            {/* <Button asChild size="lg" className="btn-gold">
               <Link href="/vestidor-virtual" className="inline-flex items-center">
                 Probar Ahora <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-            </Button>
+            </Button> */}
+            <ComingSoon />
           </div>
         </div>
       </div>
