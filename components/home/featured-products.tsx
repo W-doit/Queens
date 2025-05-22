@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart } from "lucide-react";
+import ComingSoon from "@/components/home/comingsoon";
 
 // Mock data - in a real app this would come from an API
 const featuredProducts = [
@@ -74,8 +75,9 @@ export default function FeaturedProducts() {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Descubre nuestras piezas más exclusivas cuidadosamente seleccionadas para ti
           </p>
+            <ComingSoon />
         </div>
-
+{/* 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredProducts.map((product) => (
             <Card
@@ -92,7 +94,7 @@ export default function FeaturedProducts() {
       <path d="M8 17l4-4 4 4" strokeWidth="2" />
       <circle cx="9" cy="9" r="2" strokeWidth="2" />
     </svg>
-  </span>
+  </span> */}
               {/* <div className="relative overflow-hidden aspect-[3/4]">
                 <Image
                   src={product.image}
@@ -101,7 +103,7 @@ export default function FeaturedProducts() {
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 /> */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="flex space-x-2">
                     <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
                       <ShoppingCart className="h-4 w-4" />
@@ -127,13 +129,13 @@ export default function FeaturedProducts() {
               </div>
             </Card>
           ))}
-        </div>
+        </div> */}
 
-        <div className="text-center mt-12">
+        {/* <div className="text-center mt-12">
           <Button asChild size="lg" className="btn-gold">
             <Link href="/productos">Ver Todos los Productos</Link>
-          </Button>
-        </div>
+          </Button> */}
+        {/* </div> */}
       </div>
     </section>
   );

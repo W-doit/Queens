@@ -71,9 +71,9 @@ export default function HeroSection() {
               size="lg"
               className="bg-primary text-black hover:bg-primary/90"
             >
-              <Link href="/productos">Explorar Colección</Link>
+              {/* <Link href="/productos">Explorar Colección</Link> */}
             </Button>
-            <Button
+            {/* <Button
               asChild
               variant="outline"
               size="lg"
@@ -85,7 +85,7 @@ export default function HeroSection() {
               >
                 Vestidor Virtual <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

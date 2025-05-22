@@ -139,7 +139,7 @@ export default function Header() {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-                <Link href="/carrito">
+                {/* <Link href="/carrito">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -147,7 +147,7 @@ export default function Header() {
                   >
                     <ShoppingCart className="h-5 w-5" />
                   </Button>
-                </Link>
+                </Link> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -158,18 +158,18 @@ export default function Header() {
                       <User className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
+                  {/* <DropdownMenuContent align="end"> */}
+                    {/* <DropdownMenuItem>
                       <Link href="/login" className="w-full">
                         Iniciar Sesión
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    </DropdownMenuItem> */}
+                    {/* <DropdownMenuItem>
                       <Link href="/registro" className="w-full">
                         Registrarse
                       </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
+                    </DropdownMenuItem> */}
+                  {/* </DropdownMenuContent> */}
                 </DropdownMenu>
               </>
             )}
@@ -179,7 +179,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           {!isAdmin && (
           <div className="flex md:hidden items-center space-x-4">
-            <Link href="/carrito">
+            {/* <Link href="/carrito">
               <Button
                 variant="ghost"
                 size="icon"
@@ -187,7 +187,7 @@ export default function Header() {
               >
                 <ShoppingCart className="h-5 w-5" />
               </Button>
-            </Link>
+            </Link> */}
             <Button
               variant="ghost"
               size="icon"
@@ -221,7 +221,7 @@ export default function Header() {
                 </Link>
               ))}
               <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
-                <Link
+                {/* <Link
                   href="/login"
                   className="text-sm font-medium text-white hover:text-primary"
                   onClick={() => setIsMenuOpen(false)}
@@ -234,7 +234,7 @@ export default function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Registrarse
-                </Link>
+                </Link> */}
               </div>
             </nav>
           </div>

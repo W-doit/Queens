@@ -13,8 +13,8 @@ export default function Home() {
       <FeaturedProducts />
       <Categories />
       <VirtualFittingCta />
-      <Testimonials />
-      <Newsletter />
+      {/* <Testimonials />
+      <Newsletter /> */}
     </>
   );
 }

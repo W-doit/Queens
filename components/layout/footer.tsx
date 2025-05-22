@@ -48,7 +48,7 @@ export default function Footer() {
 
           {/* Menu 1 */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 font-playfair">Explorar</h3>
+            {/* <h3 className="text-lg font-semibold mb-4 font-playfair">Explorar</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/productos" className="text-sm text-gray-400 hover:text-primary">
@@ -75,7 +75,7 @@ export default function Footer() {
                   Nuevos Lanzamientos
                 </Link>
               </li>
-            </ul>
+            </ul> */}
           </div>
 
           {/* Menu 2 */}
@@ -83,9 +83,9 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 font-playfair">Ayuda</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/sobre-nosotros" className="text-sm text-gray-400 hover:text-primary">
+                {/* <Link href="/sobre-nosotros" className="text-sm text-gray-400 hover:text-primary">
                   Sobre Nosotros
-                </Link>
+                </Link> */}
               </li>
               <li>
                 <Link href="/contacto" className="text-sm text-gray-400 hover:text-primary">
