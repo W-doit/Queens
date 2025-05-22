@@ -14,7 +14,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section className="hero-gradient text-white min-h-[90vh] flex items-center relative overflow-hidden">
+    <section className="hero-gradient text-white min-h-[90vh] flex justify-start relative overflow-hidden">
       {/* Background Pattern */}
       <div
         className="absolute inset-0 opacity-30"
@@ -40,7 +40,7 @@ export default function HeroSection() {
               alt="Queens Logo"
               width={300}
               height={100}
-              className="h-48 w-auto"
+              className="h-56 w-auto"
               priority
             />
           </Link>
@@ -49,8 +49,7 @@ export default function HeroSection() {
               ${isVisible ? "animate-fade-in" : "opacity-0"}`}
             style={{ transitionDelay: "200ms" }}
           >
-            <span>Corona tu </span>
-            <span className="gold-text">estilo</span>
+            <span className="gold-text">Corona tu estilo </span>
           </h1>
 
           <p

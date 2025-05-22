@@ -27,7 +27,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-16 bg-background">
+    <section id="contacto" className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="bg-card shadow-xl rounded-lg p-8 max-w-4xl mx-auto">
           <div className="text-center mb-6">
