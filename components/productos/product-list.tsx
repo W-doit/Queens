@@ -7,70 +7,79 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
 
 // Mock data - in a real app, this would come from an API
-const products = [
-  {
-    id: 1,
-    name: "Vestido Dorado Elegante",
-    price: 129.99,
-    image: "https://images.pexels.com/photos/7319464/pexels-photo-7319464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Vestidos",
-  },
-  {
-    id: 2,
-    name: "Blusa Negra Satinada",
-    price: 59.99,
-    image: "https://images.pexels.com/photos/9464654/pexels-photo-9464654.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Blusas",
-  },
-  {
-    id: 3,
-    name: "Falda Plisada Elegante",
-    price: 79.99,
-    image: "https://images.pexels.com/photos/1385472/pexels-photo-1385472.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Faldas",
-  },
-  {
-    id: 4,
-    name: "Conjunto Formal Dorado",
-    price: 149.99,
-    image: "https://images.pexels.com/photos/8386668/pexels-photo-8386668.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Conjuntos",
-  },
-  {
-    id: 5,
-    name: "Vestido Negro Formal",
-    price: 119.99,
-    image: "https://images.pexels.com/photos/13627461/pexels-photo-13627461.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Vestidos",
-  },
-  {
-    id: 6,
-    name: "Falda Corta Elegante",
-    price: 69.99,
-    image: "https://images.pexels.com/photos/5709664/pexels-photo-5709664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Faldas",
-  },
-  {
-    id: 7,
-    name: "Blusa Dorada de Fiesta",
-    price: 89.99,
-    image: "https://images.pexels.com/photos/5709661/pexels-photo-5709661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Blusas",
-  },
-  {
-    id: 8,
-    name: "Chaqueta Negra Elegante",
-    price: 159.99,
-    image: "https://images.pexels.com/photos/5480696/pexels-photo-5480696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    category: "Chaquetas",
-  }
-];
+// const products = [
+//   {
+//     id: 1,
+//     name: "Vestido Dorado Elegante",
+//     price: 129.99,
+//     image: "https://images.pexels.com/photos/7319464/pexels-photo-7319464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Vestidos",
+//   },
+//   {
+//     id: 2,
+//     name: "Blusa Negra Satinada",
+//     price: 59.99,
+//     image: "https://images.pexels.com/photos/9464654/pexels-photo-9464654.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Blusas",
+//   },
+//   {
+//     id: 3,
+//     name: "Falda Plisada Elegante",
+//     price: 79.99,
+//     image: "https://images.pexels.com/photos/1385472/pexels-photo-1385472.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Faldas",
+//   },
+//   {
+//     id: 4,
+//     name: "Conjunto Formal Dorado",
+//     price: 149.99,
+//     image: "https://images.pexels.com/photos/8386668/pexels-photo-8386668.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Conjuntos",
+//   },
+//   {
+//     id: 5,
+//     name: "Vestido Negro Formal",
+//     price: 119.99,
+//     image: "https://images.pexels.com/photos/13627461/pexels-photo-13627461.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Vestidos",
+//   },
+//   {
+//     id: 6,
+//     name: "Falda Corta Elegante",
+//     price: 69.99,
+//     image: "https://images.pexels.com/photos/5709664/pexels-photo-5709664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Faldas",
+//   },
+//   {
+//     id: 7,
+//     name: "Blusa Dorada de Fiesta",
+//     price: 89.99,
+//     image: "https://images.pexels.com/photos/5709661/pexels-photo-5709661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Blusas",
+//   },
+//   {
+//     id: 8,
+//     name: "Chaqueta Negra Elegante",
+//     price: 159.99,
+//     image: "https://images.pexels.com/photos/5480696/pexels-photo-5480696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+//     category: "Chaquetas",
+//   }
+// ];
 
 export default function ProductList() {
+  const [products, setProducts] = useState<ProductoOdoo[]>([]);
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
+
+    useEffect(() => {
+    // change fro fetchProductosOdoo when the API is ready
+    fetchProductosMock().then(setProducts).catch(console.error);
+  }, []);
+
+    console.log("PRODUCTOS:", products);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -126,22 +135,14 @@ export default function ProductList() {
         {products.map((product) => (
           <Card
             key={product.id}
-            className={`product-card group queens-card bg-card ${
-              visibleProducts.includes(product.id) ? "animate-fade-in" : "opacity-0"
-            }`}
+            // className={`product-card group queens-card bg-card ${
+            //   visibleProducts.includes(product.id) ? "animate-fade-in" : "opacity-0"
+            // }`}
+            className="product-card group queens-card bg-card animate-fade-in"
             style={{ transitionDelay: `${(product.id % 4) * 100}ms` }}
             data-id={product.id}
           >
             <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
-              {/* Placeholder for image */}
-            {/* <div className="relative overflow-hidden aspect-[3/4]"> */}
-              {/* <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              /> */}
                 <span className="text-gray-400 text-6xl">
     <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
@@ -170,7 +171,7 @@ export default function ProductList() {
               </div>
               <div className="absolute top-2 left-2">
                 <span className="bg-primary text-xs text-black px-2 py-1 rounded-sm">
-                  {product.category}
+                  {product.categ_id[1]}
                 </span>
               </div>
             </div>
@@ -180,7 +181,7 @@ export default function ProductList() {
                   {product.name}
                 </h3>
               </Link>
-              <p className="font-bold text-lg mt-1">€{product.price.toFixed(2)}</p>
+              <p className="font-bold text-lg mt-1">€{product.list_price.toFixed(2)}</p>
             </div>
           </Card>
         ))}
