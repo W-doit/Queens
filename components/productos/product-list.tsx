@@ -81,26 +81,28 @@ export default function ProductList() {
 
     console.log("PRODUCTOS:", products);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = Number(entry.target.getAttribute("data-id"));
-            setVisibleProducts((prev) => [...prev, id]);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+useEffect(() => {
+  if (products.length === 0) return;
 
-    const elements = document.querySelectorAll(".product-card");
-    elements.forEach((el) => observer.observe(el));
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = Number(entry.target.getAttribute("data-id"));
+          setVisibleProducts((prev) => prev.includes(id) ? prev : [...prev, id]);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
 
-    return () => {
-      elements.forEach((el) => observer.unobserve(el));
-    };
-  }, []);
+  const elements = document.querySelectorAll(".product-card");
+  elements.forEach((el) => observer.observe(el));
+
+  return () => {
+    elements.forEach((el) => observer.unobserve(el));
+  };
+}, [products]);
 
   const handleAddToCart = (id: number, name: string) => {
     toast({
@@ -135,10 +137,9 @@ export default function ProductList() {
         {products.map((product) => (
           <Card
             key={product.id}
-            // className={`product-card group queens-card bg-card ${
-            //   visibleProducts.includes(product.id) ? "animate-fade-in" : "opacity-0"
-            // }`}
-            className="product-card group queens-card bg-card animate-fade-in"
+            className={`product-card group queens-card bg-card ${
+              visibleProducts.includes(product.id) ? "animate-fade-in" : "opacity-0"
+            }`}
             style={{ transitionDelay: `${(product.id % 4) * 100}ms` }}
             data-id={product.id}
           >
