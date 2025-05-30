@@ -37,42 +37,62 @@ const colors = [
   { id: "azul", label: "Azul", color: "bg-blue-600" },
 ];
 
-export default function ProductFilters() {
-  const [priceRange, setPriceRange] = useState([0, 300]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category) 
-        : [...prev, category]
-    );
+export default function ProductFilters({
+  filters,
+  setFilters,
+}: {
+  filters: {
+    categories: string[];
+    sizes: string[];
+    colors: string[];
+    priceRange: [number, number];
   };
+  setFilters: React.Dispatch<React.SetStateAction<typeof filters>>;
+}) {
+
+const handleCategoryChange = (category: string) => {
+  setFilters((prev) => ({
+    ...prev,
+    categories: prev.categories.includes(category)
+      ? prev.categories.filter((c) => c !== category)
+      : [...prev.categories, category],
+  }));
+};
 
   const handleSizeChange = (size: string) => {
-    setSelectedSizes(prev => 
-      prev.includes(size) 
-        ? prev.filter(s => s !== size) 
-        : [...prev, size]
-    );
+    setFilters((prev) => ({
+      ...prev,
+      sizes: prev.sizes.includes(size)
+        ? prev.sizes.filter((s) => s !== size)
+        : [...prev.sizes, size],
+    }));
   };
 
   const handleColorChange = (color: string) => {
-    setSelectedColors(prev => 
-      prev.includes(color) 
-        ? prev.filter(c => c !== color) 
-        : [...prev, color]
-    );
+    setFilters((prev) => ({
+      ...prev,
+      colors: prev.colors.includes(color)
+        ? prev.colors.filter((c) => c !== color)
+        : [...prev.colors, color],
+    }));
+  };
+
+    const handlePriceChange = (range: [number, number]) => {
+    setFilters((prev) => ({
+      ...prev,
+      priceRange: range,
+    }));
   };
 
   const handleReset = () => {
-    setPriceRange([0, 300]);
-    setSelectedCategories([]);
-    setSelectedSizes([]);
-    setSelectedColors([]);
+    setFilters({
+      categories: [],
+      sizes: [],
+      colors: [],
+      priceRange: [0, 300],
+    });
   };
+
 
   return (
     <div className="bg-card p-6 rounded-lg shadow-sm border border-border">
@@ -96,9 +116,9 @@ export default function ProductFilters() {
                 <div key={category.id} className="flex items-center">
                   <Checkbox 
                     id={category.id} 
-                    checked={selectedCategories.includes(category.id)}
-                    onCheckedChange={() => handleCategoryChange(category.id)}
-                  />
+                    checked={filters.categories.includes(category.id)}
+                    onCheckedChange={() => handleCategoryChange(category.id)}                  
+                    />
                   <label 
                     htmlFor={category.id} 
                     className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -119,12 +139,12 @@ export default function ProductFilters() {
                 defaultValue={[0, 300]}
                 max={300}
                 step={10}
-                value={priceRange}
-                onValueChange={setPriceRange}
+                   value={filters.priceRange}
+                onValueChange={handlePriceChange}
               />
               <div className="flex justify-between items-center">
-                <span className="text-sm">€{priceRange[0]}</span>
-                <span className="text-sm">€{priceRange[1]}</span>
+                <span className="text-sm">€{filters.priceRange[0]}</span>
+                <span className="text-sm">€{filters.priceRange[1]}</span>
               </div>
             </div>
           </AccordionContent>
@@ -132,13 +152,13 @@ export default function ProductFilters() {
 
         <AccordionItem value="size">
           <AccordionTrigger className="text-base font-medium py-2">Talla</AccordionTrigger>
-          <AccordionContent>
+       <AccordionContent>
             <div className="flex flex-wrap gap-2 mt-2">
               {sizes.map((size) => (
                 <div 
                   key={size.id}
                   className={`size-box border border-border rounded-md flex items-center justify-center w-10 h-10 cursor-pointer hover:border-primary transition-colors 
-                    ${selectedSizes.includes(size.id) ? 'bg-primary text-black border-primary' : 'bg-background'}`}
+                    ${filters.sizes.includes(size.id) ? 'bg-primary text-black border-primary' : 'bg-background'}`}
                   onClick={() => handleSizeChange(size.id)}
                 >
                   {size.label}
@@ -150,13 +170,13 @@ export default function ProductFilters() {
 
         <AccordionItem value="color">
           <AccordionTrigger className="text-base font-medium py-2">Color</AccordionTrigger>
-          <AccordionContent>
+   <AccordionContent>
             <div className="flex flex-wrap gap-2 mt-2">
               {colors.map((color) => (
                 <div 
                   key={color.id} 
                   className={`color-box rounded-full w-8 h-8 cursor-pointer transition-transform ${color.color} border ${
-                    selectedColors.includes(color.id) 
+                    filters.colors.includes(color.id) 
                       ? 'scale-110 shadow-md border-primary' 
                       : 'border-gray-300 hover:scale-110'
                   }`}
@@ -169,7 +189,7 @@ export default function ProductFilters() {
         </AccordionItem>
       </Accordion>
 
-      <Button className="w-full mt-6 btn-gold">Aplicar Filtros</Button>
+      <Button className="w-full mt-6 btn-gold" onClick={() => {}}>Aplicar Filtros</Button>
     </div>
   );
 }
