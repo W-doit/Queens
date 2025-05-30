@@ -10,9 +10,11 @@ import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
 
 type ProductListProps = {
   products: ProductoOdoo[];
+  sort: string;
+  setSort: (value: string) => void;
 };
 
-export default function ProductList({ products }: ProductListProps) {
+export default function ProductList({ products, sort, setSort }: ProductListProps) {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
 
@@ -72,11 +74,16 @@ export default function ProductList({ products }: ProductListProps) {
           <label htmlFor="sort" className="text-sm">
             Ordenar por:
           </label>
-          <select id="sort" className="text-sm border rounded p-1">
-            <option>Relevancia</option>
-            <option>Precio: menor a mayor</option>
-            <option>Precio: mayor a menor</option>
-            <option>Más recientes</option>
+       <select
+            id="sort"
+            className="text-sm border rounded p-1"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="relevancia">Relevancia</option>
+            <option value="precio-menor-mayor">Precio: menor a mayor</option>
+            <option value="precio-mayor-menor">Precio: mayor a menor</option>
+            <option value="recientes">Más recientes</option>
           </select>
         </div>
       </div>

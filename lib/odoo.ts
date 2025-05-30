@@ -1,5 +1,6 @@
 //mockup function
 export async function fetchProductosMock(): Promise<ProductoOdoo[]> {
+// In a real application, you would fetch this data from ODOO API
 return [
     {
       id: 1,
