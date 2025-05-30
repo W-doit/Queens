@@ -1,63 +1,79 @@
 //mockup function
 export async function fetchProductosMock(): Promise<ProductoOdoo[]> {
-  return [
-  {
-    id: 1,
-    name: "Vestido Dorado Elegante",
-    list_price: 129.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [1, "Vestidos"],
-  },
-  {
-    id: 2,
-    name: "Blusa Negra Satinada",
-    list_price:  59.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [2, "Blusas"],
-  },
-  {
-    id: 3,
-    name: "Falda Plisada Elegante",
-    list_price:  79.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [3, "Faldas"],
-  },
-  {
-    id: 4,
-    name: "Conjunto Formal Dorado",
-    list_price:  149.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [4, "Conjuntos"],
-  },
-  {
-    id: 5,
-    name: "Vestido Negro Formal",
-    list_price:  119.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [1, "Vestidos"],
-  },
-  {
-    id: 6,
-    name: "Falda Corta Elegante",
-    list_price:  69.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [3, "Faldas"],
-  },
-  {
-    id: 7,
-    name: "Blusa Dorada de Fiesta",
-    list_price:  89.99,
-    image_1920: "",
-    categ_id: [2, "Blusas"],
-  },
-  {
-    id: 8,
-    name: "Chaqueta Negra Elegante",
-    list_price:  159.99,
-    image_1920: "/placeholder.jpg",
-    categ_id: [5, "Chaquetas"],
-  },
-];
+return [
+    {
+      id: 1,
+      name: "Vestido Dorado Elegante",
+      list_price: 129.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [1, "Vestidos"],
+      color: "dorado",
+      size: "M",
+    },
+    {
+      id: 2,
+      name: "Blusa Negra Satinada",
+      list_price: 59.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [2, "Blusas"],
+      color: "negro",
+      size: "S",
+    },
+    {
+      id: 3,
+      name: "Falda Plisada Elegante",
+      list_price: 79.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [3, "Faldas"],
+      color: "negro",
+      size: "L",
+    },
+    {
+      id: 4,
+      name: "Conjunto Formal Dorado",
+      list_price: 149.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [4, "Conjuntos"],
+      color: "dorado",
+      size: "M",
+    },
+    {
+      id: 5,
+      name: "Vestido Negro Formal",
+      list_price: 119.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [1, "Vestidos"],
+      color: "negro",
+      size: "S",
+    },
+    {
+      id: 6,
+      name: "Falda Corta Elegante",
+      list_price: 69.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [3, "Faldas"],
+      color: "rojo",
+      size: "M",
+    },
+    {
+      id: 7,
+      name: "Blusa Dorada de Fiesta",
+      list_price: 89.99,
+      image_1920: "",
+      categ_id: [2, "Blusas"],
+      color: "dorado",
+      size: "L",
+    },
+    {
+      id: 8,
+      name: "Chaqueta Negra Elegante",
+      list_price: 159.99,
+      image_1920: "/placeholder.jpg",
+      categ_id: [5, "Chaquetas"],
+      color: "negro",
+      size: "M",
+    },
+  ];
 }
 
 //types
@@ -67,6 +83,8 @@ export interface ProductoOdoo {
   list_price: number;
   image_1920?: string;
   categ_id: [number, string];
+  color?: string;
+  size?: string;
 }
 
 interface JsonRpcResponse<T> {

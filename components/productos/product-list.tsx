@@ -2,107 +2,51 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
 
-// Mock data - in a real app, this would come from an API
-// const products = [
-//   {
-//     id: 1,
-//     name: "Vestido Dorado Elegante",
-//     price: 129.99,
-//     image: "https://images.pexels.com/photos/7319464/pexels-photo-7319464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Vestidos",
-//   },
-//   {
-//     id: 2,
-//     name: "Blusa Negra Satinada",
-//     price: 59.99,
-//     image: "https://images.pexels.com/photos/9464654/pexels-photo-9464654.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Blusas",
-//   },
-//   {
-//     id: 3,
-//     name: "Falda Plisada Elegante",
-//     price: 79.99,
-//     image: "https://images.pexels.com/photos/1385472/pexels-photo-1385472.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Faldas",
-//   },
-//   {
-//     id: 4,
-//     name: "Conjunto Formal Dorado",
-//     price: 149.99,
-//     image: "https://images.pexels.com/photos/8386668/pexels-photo-8386668.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Conjuntos",
-//   },
-//   {
-//     id: 5,
-//     name: "Vestido Negro Formal",
-//     price: 119.99,
-//     image: "https://images.pexels.com/photos/13627461/pexels-photo-13627461.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Vestidos",
-//   },
-//   {
-//     id: 6,
-//     name: "Falda Corta Elegante",
-//     price: 69.99,
-//     image: "https://images.pexels.com/photos/5709664/pexels-photo-5709664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Faldas",
-//   },
-//   {
-//     id: 7,
-//     name: "Blusa Dorada de Fiesta",
-//     price: 89.99,
-//     image: "https://images.pexels.com/photos/5709661/pexels-photo-5709661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Blusas",
-//   },
-//   {
-//     id: 8,
-//     name: "Chaqueta Negra Elegante",
-//     price: 159.99,
-//     image: "https://images.pexels.com/photos/5480696/pexels-photo-5480696.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-//     category: "Chaquetas",
-//   }
-// ];
+type ProductListProps = {
+  products: ProductoOdoo[];
+};
 
-export default function ProductList() {
-  const [products, setProducts] = useState<ProductoOdoo[]>([]);
+export default function ProductList({ products }: ProductListProps) {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
 
-    useEffect(() => {
-    // change fro fetchProductosOdoo when the API is ready
-    fetchProductosMock().then(setProducts).catch(console.error);
-  }, []);
+  // useEffect(() => {
+  //   // change fro fetchProductosOdoo when the API is ready
+  //   fetchProductosMock().then(setProducts).catch(console.error);
+  // }, []);
 
-    console.log("PRODUCTOS:", products);
+  // console.log("PRODUCTOS:", products);
 
-useEffect(() => {
-  if (products.length === 0) return;
+  useEffect(() => {
+    if (products.length === 0) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const id = Number(entry.target.getAttribute("data-id"));
-          setVisibleProducts((prev) => prev.includes(id) ? prev : [...prev, id]);
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = Number(entry.target.getAttribute("data-id"));
+            setVisibleProducts((prev) =>
+              prev.includes(id) ? prev : [...prev, id]
+            );
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-  const elements = document.querySelectorAll(".product-card");
-  elements.forEach((el) => observer.observe(el));
+    const elements = document.querySelectorAll(".product-card");
+    elements.forEach((el) => observer.observe(el));
 
-  return () => {
-    elements.forEach((el) => observer.unobserve(el));
-  };
-}, [products]);
+    return () => {
+      elements.forEach((el) => observer.unobserve(el));
+    };
+  }, [products]);
 
   const handleAddToCart = (id: number, name: string) => {
     toast({
@@ -121,9 +65,13 @@ useEffect(() => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <p className="text-muted-foreground">Mostrando {products.length} productos</p>
+        <p className="text-muted-foreground">
+          Mostrando {products.length} productos
+        </p>
         <div className="flex items-center space-x-2">
-          <label htmlFor="sort" className="text-sm">Ordenar por:</label>
+          <label htmlFor="sort" className="text-sm">
+            Ordenar por:
+          </label>
           <select id="sort" className="text-sm border rounded p-1">
             <option>Relevancia</option>
             <option>Precio: menor a mayor</option>
@@ -138,33 +86,50 @@ useEffect(() => {
           <Card
             key={product.id}
             className={`product-card group queens-card bg-card ${
-              visibleProducts.includes(product.id) ? "animate-fade-in" : "opacity-0"
+              visibleProducts.includes(product.id)
+                ? "animate-fade-in"
+                : "opacity-0"
             }`}
             style={{ transitionDelay: `${(product.id % 4) * 100}ms` }}
             data-id={product.id}
           >
             <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
-                <span className="text-gray-400 text-6xl">
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
-      <path d="M8 17l4-4 4 4" strokeWidth="2" />
-      <circle cx="9" cy="9" r="2" strokeWidth="2" />
-    </svg>
-  </span>
+              <span className="text-gray-400 text-6xl">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-20 h-20 mx-auto"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <rect
+                    x="3"
+                    y="3"
+                    width="18"
+                    height="18"
+                    rx="2"
+                    strokeWidth="2"
+                  />
+                  <path d="M8 17l4-4 4 4" strokeWidth="2" />
+                  <circle cx="9" cy="9" r="2" strokeWidth="2" />
+                </svg>
+              </span>
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="flex space-x-2">
-                  <Button 
-                    size="icon" 
+                  <Button
+                    size="icon"
                     className="rounded-full bg-white text-black hover:bg-primary"
                     onClick={() => handleAddToCart(product.id, product.name)}
                   >
                     <ShoppingCart className="h-4 w-4" />
                   </Button>
-                  <Button 
-                    size="icon" 
-                    variant="outline" 
+                  <Button
+                    size="icon"
+                    variant="outline"
                     className="rounded-full border-white text-black hover:bg-white/20"
-                    onClick={() => handleAddToWishlist(product.id, product.name)}
+                    onClick={() =>
+                      handleAddToWishlist(product.id, product.name)
+                    }
                   >
                     <Heart className="h-4 w-4" />
                   </Button>
@@ -182,18 +147,30 @@ useEffect(() => {
                   {product.name}
                 </h3>
               </Link>
-              <p className="font-bold text-lg mt-1">€{product.list_price.toFixed(2)}</p>
+              <p className="font-bold text-lg mt-1">
+                €{product.list_price.toFixed(2)}
+              </p>
             </div>
           </Card>
         ))}
       </div>
 
       <div className="mt-8 flex justify-center">
-        <Button variant="outline" className="mr-2">Anterior</Button>
-        <Button variant="outline" className="bg-primary text-black">1</Button>
-        <Button variant="outline" className="mx-1">2</Button>
-        <Button variant="outline" className="mx-1">3</Button>
-        <Button variant="outline" className="ml-2">Siguiente</Button>
+        <Button variant="outline" className="mr-2">
+          Anterior
+        </Button>
+        <Button variant="outline" className="bg-primary text-black">
+          1
+        </Button>
+        <Button variant="outline" className="mx-1">
+          2
+        </Button>
+        <Button variant="outline" className="mx-1">
+          3
+        </Button>
+        <Button variant="outline" className="ml-2">
+          Siguiente
+        </Button>
       </div>
     </div>
   );
