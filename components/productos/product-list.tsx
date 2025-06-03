@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
+import { useCart } from "@/context/CartContext";
 
 type ProductListProps = {
   products: ProductoOdoo[];
@@ -17,6 +18,7 @@ type ProductListProps = {
 export default function ProductList({ products, sort, setSort }: ProductListProps) {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
+   const { addToCart } = useCart(); 
 
   // useEffect(() => {
   //   // change fro fetchProductosOdoo when the API is ready
@@ -51,10 +53,14 @@ export default function ProductList({ products, sort, setSort }: ProductListProp
   }, [products]);
 
   const handleAddToCart = (id: number, name: string) => {
-    toast({
-      title: "Producto añadido",
-      description: `${name} ha sido añadido a tu carrito.`,
-    });
+    const product = products.find((p) => p.id === id);
+    if (product) {
+      addToCart(product);
+      toast({
+        title: "Producto añadido",
+        description: `${name} ha sido añadido a tu carrito.`,
+      });
+    }
   };
 
   const handleAddToWishlist = (id: number, name: string) => {
