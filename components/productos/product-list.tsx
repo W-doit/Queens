@@ -20,13 +20,6 @@ export default function ProductList({ products, sort, setSort }: ProductListProp
   const { toast } = useToast();
    const { addToCart } = useCart(); 
 
-  // useEffect(() => {
-  //   // change fro fetchProductosOdoo when the API is ready
-  //   fetchProductosMock().then(setProducts).catch(console.error);
-  // }, []);
-
-  // console.log("PRODUCTOS:", products);
-
   useEffect(() => {
     if (products.length === 0) return;
 
@@ -155,7 +148,7 @@ export default function ProductList({ products, sort, setSort }: ProductListProp
               </div>
             </div>
             <div className="p-4">
-              <Link href={`/producto/${product.id}`}>
+              <Link href={`/productos/${product.id}`}>
                 <h3 className="font-medium hover:text-primary transition-colors">
                   {product.name}
                 </h3>
