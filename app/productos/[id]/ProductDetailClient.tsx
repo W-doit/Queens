@@ -1,9 +1,9 @@
 "use client";
 
-import { ProductoOdoo } from "@/lib/odoo";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { ProductoOdoo } from "@/lib/odoo";
 
 export default function ProductDetailClient({ product }: { product: ProductoOdoo }) {
   const { addToCart } = useCart();

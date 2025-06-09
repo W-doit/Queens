@@ -6,14 +6,14 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart } from "lucide-react";
-import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
+import { fetchProductosApi, ProductoOdoo } from "@/lib/odoo";
 
 export default function FeaturedProducts() {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<ProductoOdoo[]>([]);
 
 useEffect(() => {
-  fetchProductosMock().then((data) => {
+  fetchProductosApi().then((data) => {
     console.log("PRODUCTOS DESTACADOS:", data);
     setFeaturedProducts(data);
   });

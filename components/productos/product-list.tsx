@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
+import { ProductoOdoo } from "@/lib/odoo";
 import { useCart } from "@/context/CartContext";
 
 type ProductListProps = {

@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import ProductList from "@/components/productos/product-list";
 import ProductFilters from "@/components/productos/product-filters";
-import { fetchProductosMock, ProductoOdoo } from "@/lib/odoo";
+import { fetchProductosApi } from "@/lib/odoo";
+import { ProductoOdoo } from "@/lib/odoo";
 
 export default function ProductosPage() {
   const [products, setProducts] = useState<ProductoOdoo[]>([]);
@@ -17,12 +18,12 @@ export default function ProductosPage() {
     priceRange: [0, 300] as [number, number],
   });
 
-  useEffect(() => {
-    fetchProductosMock().then((data) => {
-      setProducts(data);
-      setFilteredProducts(data);
-    });
-  }, []);
+useEffect(() => {
+  fetchProductosApi().then((data) => {
+    setProducts(data);
+    setFilteredProducts(data);
+  });
+}, []);
 
   useEffect(() => {
     let filtered = products.filter((product) => {
