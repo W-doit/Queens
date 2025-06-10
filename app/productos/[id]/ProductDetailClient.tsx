@@ -13,12 +13,14 @@ export default function ProductDetailClient({ product }: { product: ProductoOdoo
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2">
-          <img
-            src={product.image_1920}
-            alt={product.name}
-            className="w-full rounded-lg object-cover bg-gray-100"
-            style={{ maxHeight: 400 }}
-          />
+<div className="w-full aspect-[3/2] bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+  <img
+    src={product.image_1920 || product.image_url}
+    alt={product.name}
+    className="w-full h-full object-contain"
+    style={{ maxHeight: 250 }}
+  />
+</div>
         </div>
         <div className="md:w-1/2">
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>

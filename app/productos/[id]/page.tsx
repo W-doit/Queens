@@ -1,7 +1,14 @@
-import { fetchProductoById } from "@/lib/odoo";
+import { fetchProductoById, mockProductos } from "@/lib/odoo";
 import ProductDetailClient from "./ProductDetailClient";
 
-export default async function ProductDetailPage({ params }: { params: { id: string } }) {
+export async function generateStaticParams() {
+  return mockProductos.map(product => ({
+    id: product.id.toString(),
+  }));
+}
+
+export default async function ProductDetailPage(props: { params: { id: string } }) {
+  const { params } = props;
   const product = await fetchProductoById(params.id);
 
   if (!product) {

@@ -15,10 +15,14 @@ type ProductListProps = {
   setSort: (value: string) => void;
 };
 
-export default function ProductList({ products, sort, setSort }: ProductListProps) {
+export default function ProductList({
+  products,
+  sort,
+  setSort,
+}: ProductListProps) {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
-   const { addToCart } = useCart(); 
+  const { addToCart } = useCart();
 
   useEffect(() => {
     if (products.length === 0) return;
@@ -73,7 +77,7 @@ export default function ProductList({ products, sort, setSort }: ProductListProp
           <label htmlFor="sort" className="text-sm">
             Ordenar por:
           </label>
-       <select
+          <select
             id="sort"
             className="text-sm border rounded p-1"
             value={sort}
@@ -143,7 +147,10 @@ export default function ProductList({ products, sort, setSort }: ProductListProp
               </div>
               <div className="absolute top-2 left-2">
                 <span className="bg-primary text-xs text-black px-2 py-1 rounded-sm">
-                  {product.categ_id[1]}
+                  {Array.isArray(product.categ_id) &&
+                  product.categ_id.length > 1
+                    ? product.categ_id[1]
+                    : "Sin categoría"}
                 </span>
               </div>
             </div>
