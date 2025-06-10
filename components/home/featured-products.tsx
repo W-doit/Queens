@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart } from "lucide-react";
 import { fetchProductosApi, ProductoOdoo } from "@/lib/odoo";
 
+
 export default function FeaturedProducts() {
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<ProductoOdoo[]>([]);
@@ -88,9 +89,11 @@ useEffect(() => {
                   </div>
                 </div>
                 <div className="absolute top-2 left-2">
-                  <span className="bg-primary text-xs text-black px-2 py-1 rounded-sm">
-                    {product.categ_id[1]}
-                  </span>
+                <span className="bg-primary text-xs text-black px-2 py-1 rounded-sm">
+  {Array.isArray(product.categ_id) && product.categ_id.length > 1
+    ? product.categ_id[1]
+    : "Sin categoría"}
+</span>
                 </div>
               </div>
               <div className="p-4">

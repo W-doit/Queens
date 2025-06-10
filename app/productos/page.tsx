@@ -6,6 +6,7 @@ import ProductFilters from "@/components/productos/product-filters";
 import { fetchProductosApi } from "@/lib/odoo";
 import { ProductoOdoo } from "@/lib/odoo";
 
+
 export default function ProductosPage() {
   const [products, setProducts] = useState<ProductoOdoo[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductoOdoo[]>([]);
@@ -28,9 +29,12 @@ useEffect(() => {
   useEffect(() => {
     let filtered = products.filter((product) => {
       //category filter
-      const matchesCategory =
-        filters.categories.length === 0 ||
-        filters.categories.includes(product.categ_id[1].toLowerCase());
+ const matchesCategory =
+  filters.categories.length === 0 ||
+  (
+    Array.isArray(product.categ_id) &&
+    filters.categories.includes(product.categ_id[1].toLowerCase())
+  );
       //price filter
       const matchesPrice =
         product.list_price >= filters.priceRange[0] &&
@@ -40,9 +44,12 @@ useEffect(() => {
         filters.sizes.length === 0 ||
         (product.size && filters.sizes.includes(product.size.toLowerCase()));
 //color filter
-      const matchesColor =
-        filters.colors.length === 0 ||
-        (product.color && filters.colors.includes(product.color.toLowerCase()));
+const matchesColor =
+  filters.colors.length === 0 ||
+  (product.colors &&
+    product.colors.some((color) =>
+      filters.colors.includes(color.name.toLowerCase())
+    ));
 
       return matchesCategory && matchesPrice && matchesSize && matchesColor;
     });
