@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart } from "lucide-react";
 import { fetchProductosApi, ProductoOdoo } from "@/lib/odoo";
+import WhatsAppButton from "@/components/productos/whatsapp-button";
 
 
 export default function FeaturedProducts() {
@@ -80,9 +81,10 @@ useEffect(() => {
           />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="flex space-x-2">
-                    <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
+                    {/* <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
                       <ShoppingCart className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
+                     <WhatsAppButton productName={product.name} />
                     <Button size="icon" variant="outline" className="rounded-full border-white text-black hover:bg-white/20">
                       <Heart className="h-4 w-4" />
                     </Button>
@@ -97,7 +99,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="p-4">
-                <Link href={`/producto/${product.id}`}>
+                <Link href={`/productos/${product.id}`}>
                   <h3 className="font-medium hover:text-primary transition-colors">
                     {product.name}
                   </h3>

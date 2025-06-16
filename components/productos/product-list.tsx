@@ -4,10 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart, Heart, HeartOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductoOdoo } from "@/lib/odoo";
 import { useCart } from "@/context/CartContext";
+import { useFavorites } from "@/context/FavContext";
+import WhatsAppButton from "./whatsapp-button";
+
 
 type ProductListProps = {
   products: ProductoOdoo[];
@@ -23,6 +26,7 @@ export default function ProductList({
   const [visibleProducts, setVisibleProducts] = useState<number[]>([]);
   const { toast } = useToast();
   const { addToCart } = useCart();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
 
   useEffect(() => {
     if (products.length === 0) return;
@@ -126,23 +130,26 @@ export default function ProductList({
               </span>
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="flex space-x-2">
-                  <Button
+                  <WhatsAppButton productName={product.name} />
+                  {/* <Button
                     size="icon"
                     className="rounded-full bg-white text-black hover:bg-primary"
                     onClick={() => handleAddToCart(product.id, product.name)}
                   >
                     <ShoppingCart className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="rounded-full border-white text-black hover:bg-white/20"
-                    onClick={() =>
-                      handleAddToWishlist(product.id, product.name)
-                    }
-                  >
-                    <Heart className="h-4 w-4" />
-                  </Button>
+                  </Button> */}
+              <Button
+    size="icon"
+   variant="outline"
+  className={`rounded-full border-white text-black hover:bg-white/20 ${isFavorite(product.id) ? "bg-red-100 text-red-500 border-red-200" : ""}`}    onClick={() =>
+      isFavorite(product.id)
+        ? removeFromFavorites(product.id)
+        : addToFavorites(product)
+    }
+    aria-label={isFavorite(product.id) ? "Quitar de favoritos" : "Añadir a favoritos"}
+  >
+    <Heart className="h-4 w-4" fill={isFavorite(product.id) ? "#ef4444" : "none"} />
+  </Button>
                 </div>
               </div>
               <div className="absolute top-2 left-2">
