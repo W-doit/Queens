@@ -174,6 +174,13 @@ export default function ProductList({
           </Card>
         ))}
       </div>
+      <iframe 
+  src="https://queens6.odoo.com/shop" 
+  width="100%" 
+  height="1000" 
+  style={{ border: "none", overflow: "auto" }}
+  loading="lazy">
+</iframe>
 
       <div className="mt-8 flex justify-center">
         <Button variant="outline" className="mr-2">
