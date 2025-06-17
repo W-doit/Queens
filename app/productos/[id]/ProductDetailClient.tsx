@@ -60,8 +60,8 @@ export default function ProductDetailClient({
           </Button> */}
         <WhatsAppButton productName={product.name} />
            <Button size="icon" variant="outline" className="rounded-full border-white text-black hover:bg-white/20">
-                      Añadir a favoritos
-                    </Button><Heart className="h-4 w-4" />
+           Añadir a favoritos <Heart className="h-4 w-4" />
+           </Button>
         </div>
       </div>
     </div>

@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${playfair.variable} ${raleway.variable} font-sans min-h-screen flex flex-col ${isHomePage ? 'home-page' : ''}`}>
-            <FavoritesProvider>
+         <FavoritesProvider>
         <CartProvider>
         <ThemeProvider
           attribute="class"
