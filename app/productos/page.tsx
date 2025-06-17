@@ -1,5 +1,7 @@
 import ProductList from '@/components/productos/product-list';
 import ProductFilters from '@/components/productos/product-filters';
+import OdooShopIframe from "@/components/productos/OdooShopIframe";
+
 
 export default function ProductosPage() {
   return (
@@ -13,10 +15,13 @@ export default function ProductosPage() {
       
       <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/4">
-          <ProductFilters />
+          {/* <ProductFilters /> */}
         </div>
         <div className="md:w-3/4">
-          <ProductList />
+          {/* <ProductList /> */}
+            <div className="container mx-auto px-4 py-8">
+      <OdooShopIframe />
+    </div>
         </div>
       </div>
     </div>
