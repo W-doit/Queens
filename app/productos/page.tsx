@@ -1,7 +1,7 @@
 import ProductList from '@/components/productos/product-list';
 import ProductFilters from '@/components/productos/product-filters';
 import OdooShopIframe from "@/components/productos/OdooShopIframe";
-
+import Footer from '@/components/layout/footer';
 
 export default function ProductosPage() {
   return (
@@ -12,18 +12,17 @@ export default function ProductosPage() {
           Descubre nuestras prendas exclusivas diseñadas para realzar tu estilo personal
         </p>
       </div>
+    
       
-      <div className="flex flex-col md:flex-row gap-8">
+      {/* <div className="flex flex-col md:flex-row gap-8">
         <div className="md:w-1/4">
-          {/* <ProductFilters /> */}
+          <ProductFilters />
         </div>
         <div className="md:w-3/4">
-          {/* <ProductList /> */}
-            <div className="container mx-auto px-4 py-8">
-      <OdooShopIframe />
-    </div>
+          <ProductList />
         </div>
-      </div>
+      </div> */}
+      <OdooShopIframe />
     </div>
   );
 }
