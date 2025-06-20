@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-const MENU_HEIGHT_DESKTOP = 68; 
+const MENU_HEIGHT_DESKTOP = 72; 
 const MENU_HEIGHT_MOBILE = 72;
 
 function getMenuHeight() {

@@ -139,7 +139,7 @@ export default function Header() {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-                <Link href="/carrito">
+                {/* <Link href="/carrito">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -147,7 +147,7 @@ export default function Header() {
                   >
                     <ShoppingCart className="h-5 w-5" />
                   </Button>
-                </Link>
+                </Link> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
