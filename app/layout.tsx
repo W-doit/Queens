@@ -2,9 +2,12 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Raleway } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
+import { CartProvider } from "@/context/CartContext";
+import { FavoritesProvider } from "@/context/FavContext";
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -33,6 +36,8 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${playfair.variable} ${raleway.variable} font-sans min-h-screen flex flex-col ${isHomePage ? 'home-page' : ''}`}>
+         <FavoritesProvider>
+        <CartProvider>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -45,6 +50,9 @@ export default function RootLayout({
           <Footer/>
           <Toaster />
         </ThemeProvider>
+        </CartProvider>
+       </FavoritesProvider>
+
       </body>
     </html>
   );
