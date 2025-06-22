@@ -93,7 +93,7 @@
 }
 
 .gold-text {
-  background: linear-gradient(to right, hsl(var(--queens-gold)), hsl(var(--queens-gold-light)));
+  background: linear-gradient(to right, hsl(var(--queens-gold-light)), hsl(var(--queens-gold-dark)));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -271,14 +271,22 @@ export default function VirtualFittingRoom() {
                       }`}
                       onClick={() => handleSelectProduct(product.id)}
                     >
-                      <div className="aspect-[3/4] relative">
-                        <Image
+                      {/* <div className="aspect-[3/4] relative"> */}
+                      <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
+                                  <span className="text-gray-400 text-6xl">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      <path d="M8 17l4-4 4 4" strokeWidth="2" />
+      <circle cx="9" cy="9" r="2" strokeWidth="2" />
+    </svg>
+  </span>
+                        {/* <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 50vw, 20vw"
-                        />
+                        /> */}
                         {selectedProduct === product.id && (
                           <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
                             <Check className="h-4 w-4 text-white" />
@@ -307,14 +315,22 @@ export default function VirtualFittingRoom() {
                       }`}
                       onClick={() => handleSelectProduct(product.id)}
                     >
-                      <div className="aspect-[3/4] relative">
+                      {/* <div className="aspect-[3/4] relative">
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 50vw, 20vw"
-                        />
+                        /> */}
+                                            <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
+                                  <span className="text-gray-400 text-6xl">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      <path d="M8 17l4-4 4 4" strokeWidth="2" />
+      <circle cx="9" cy="9" r="2" strokeWidth="2" />
+    </svg>
+  </span>
                         {selectedProduct === product.id && (
                           <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
                             <Check className="h-4 w-4 text-white" />
@@ -343,14 +359,22 @@ export default function VirtualFittingRoom() {
                       }`}
                       onClick={() => handleSelectProduct(product.id)}
                     >
-                      <div className="aspect-[3/4] relative">
+                      {/* <div className="aspect-[3/4] relative">
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 50vw, 20vw"
-                        />
+                        /> */}
+                                            <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
+                                  <span className="text-gray-400 text-6xl">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      <path d="M8 17l4-4 4 4" strokeWidth="2" />
+      <circle cx="9" cy="9" r="2" strokeWidth="2" />
+    </svg>
+  </span>
                         {selectedProduct === product.id && (
                           <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
                             <Check className="h-4 w-4 text-white" />
@@ -379,14 +403,22 @@ export default function VirtualFittingRoom() {
                       }`}
                       onClick={() => handleSelectProduct(product.id)}
                     >
-                      <div className="aspect-[3/4] relative">
+                      {/* <div className="aspect-[3/4] relative">
                         <Image
                           src={product.image}
                           alt={product.name}
                           fill
                           className="object-cover"
                           sizes="(max-width: 768px) 50vw, 20vw"
-                        />
+                        /> */}
+                                            <div className="relative overflow-hidden aspect-[3/4] flex items-center justify-center bg-gray-200">
+                                  <span className="text-gray-400 text-6xl">
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeWidth="2" />
+      <path d="M8 17l4-4 4 4" strokeWidth="2" />
+      <circle cx="9" cy="9" r="2" strokeWidth="2" />
+    </svg>
+  </span>
                         {selectedProduct === product.id && (
                           <div className="absolute top-2 right-2 bg-primary rounded-full p-1">
                             <Check className="h-4 w-4 text-white" />
