@@ -1,4 +1,3 @@
-
 // Base model interface for Odoo objects
 export interface OdooModel {
   id: number;
@@ -12,7 +11,7 @@ export interface SizeInfo {
   name: string;
   product_id: number;
   qty_available?: number;
-  barcode?: string;
+  barcode?: string | boolean; // Update to allow boolean values
 }
 
 // Color information for product variants
@@ -42,15 +41,20 @@ export interface ProductTemplate extends OdooModel {
   purchase_ok?: boolean;
 }
 
-// Product Variant from Odoo
+// Product Variant from Odoo - Combined definition with all properties
 export interface ProductVariant extends OdooModel {
   product_tmpl_id: [number, string];
   name: string;
-  barcode?: string;
+  barcode?: string | boolean;
   default_code?: string;
   qty_available?: number;
   product_template_attribute_value_ids?: number[];
   combination_indices?: string;
+  display_name?: string;
+  virtual_available?: number;
+  incoming_qty?: number;
+  outgoing_qty?: number;
+  [key: string]: any;
 }
 
 // Product Category
@@ -77,6 +81,7 @@ export interface CreateProductRequest {
   has_colors?: boolean;
   colors?: string[];
   image_1920?: string;
+  available_in_pos?: boolean; // Add this field for POS availability
 }
 
 // Request body for updating a product
@@ -93,6 +98,7 @@ export interface UpdateProductRequest {
   sizes?: string[];
   colors?: string[];
   image_1920?: string;
+  available_in_pos?: boolean; // Add this field for POS availability
 }
 
 // API response format for a product
@@ -110,6 +116,7 @@ export interface ProductResponse {
   default_code?: string;
   sizes?: SizeInfo[];
   colors?: ColorInfo[];
+  available_in_pos?: boolean; // Add this field for POS availability
 }
 
 // API response for paginated product list
@@ -138,20 +145,6 @@ export interface InventoryUpdateResponse {
   message: string;
 }
 
-// Product variant representation (expanded)
-export interface ProductVariant extends OdooModel {
-  name: string;
-  product_tmpl_id?: number[];
-  product_template_attribute_value_ids?: number[];
-  qty_available?: number;
-  barcode?: string | boolean;
-  display_name?: string;
-  virtual_available?: number;
-  incoming_qty?: number;
-  outgoing_qty?: number;
-  [key: string]: any;
-}
-
 // Variant update information
 export interface VariantUpdates {
   name?: string;
@@ -165,4 +158,9 @@ export interface UpdatedVariant {
   updates?: string[];
   name: string;
   barcode?: string | boolean;
+}
+
+// Request for enabling products in POS
+export interface EnableForPOSRequest {
+  productIds: number[];
 }

@@ -67,4 +67,6 @@ router.post("/orders/:id/confirm", asyncHandler(VentasController.confirmOrder));
 
 router.post("/orders/:id/debug-stock", asyncHandler(debugStockProcessing));
 
+router.post("/config/update", asyncHandler(SessionController.configurePOS));
+
 export default router;

@@ -1005,3 +1005,49 @@ export const fixPosData = async (req: Request, res: Response) => {
     });
   }
 };
+
+/**
+ * Configure POS
+ */
+export const configurePOS = async (req: Request, res: Response) => {
+  try {
+    // Get available POS configs
+    const configs = await callOdoo<any[]>(
+      "pos.config",
+      "search_read",
+      [[]],
+      { fields: ["id", "name", "module_pos_restaurant"] }
+    );
+    
+    if (!configs || configs.length === 0) {
+      return res.status(404).json({
+        error: "No POS configurations found",
+        message: "Please create a POS configuration first"
+      });
+    }
+    
+    // Update each config to show all products
+    for (const config of configs) {
+      await callOdoo("pos.config", "write", [
+        [config.id],
+        {
+          limit_categories: false,  // Don't limit by categories
+          iface_start_categ_id: false,  // Show all categories at start
+          available_pricelist_ids: [[4, 1]]  // Add default pricelist (usually ID 1)
+        }
+      ]);
+    }
+    
+    return res.json({
+      success: true,
+      message: `Updated ${configs.length} POS configurations`,
+      configs: configs.map(c => ({ id: c.id, name: c.name }))
+    });
+  } catch (error: any) {
+    console.error("Error configuring POS:", error);
+    return res.status(500).json({
+      error: "Failed to configure POS",
+      message: error.message
+    });
+  }
+};
