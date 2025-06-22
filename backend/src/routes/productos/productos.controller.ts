@@ -442,3 +442,152 @@ export const deleteProduct = async (req: Request, res: Response) => {
     });
   }
 };
+
+
+/**
+ * Enable products for POS
+ */
+export const enableProductsForPOS = async (req: Request, res: Response) => {
+  try {
+    const { productIds } = req.body;
+    
+    if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+      return res.status(400).json({
+        error: "Invalid request",
+        message: "Please provide an array of product IDs"
+      });
+    }
+    
+    // Update each product to be available in POS
+    await callOdoo("product.product", "write", [
+      productIds,
+      { available_in_pos: true }
+    ]);
+    
+    // Additionally, make sure these products are in a category that's available in POS
+    // Get the default POS category (usually "All")
+    const categories = await callOdoo<any[]>(
+      "pos.category",
+      "search_read",
+      [[]],
+      { fields: ["id", "name"], limit: 1 }
+    );
+    
+    let posCategoryId = null;
+    if (categories && categories.length > 0) {
+      posCategoryId = categories[0].id;
+    }
+    
+    // If we found a POS category, assign products to it
+    if (posCategoryId) {
+      await callOdoo("product.product", "write", [
+        productIds,
+        { pos_categ_id: posCategoryId }
+      ]);
+    }
+    
+    return res.json({
+      success: true,
+      message: `${productIds.length} products updated to be available in POS`,
+      productIds: productIds,
+      pos_category: posCategoryId ? categories[0].name : null
+    });
+  } catch (error: any) {
+    console.error("Error enabling products for POS:", error);
+    return res.status(500).json({
+      error: "Failed to update products",
+      message: error.message
+    });
+  }
+};
+
+/**
+ * Enable all products for POS
+ */
+export const enableAllProductsForPOS = async (req: Request, res: Response) => {
+  try {
+    // Find all products with type 'product' or 'consu' (storable or consumable)
+    const products = await callOdoo<any[]>(
+      "product.product",
+      "search_read",
+      [[["type", "in", ["product", "consu"]]]],
+      { fields: ["id", "name"] }
+    );
+    
+    if (!products || products.length === 0) {
+      return res.json({
+        message: "No products found to enable for POS",
+        count: 0
+      });
+    }
+    
+    const productIds = products.map(p => p.id);
+    
+    // Update all products to be available in POS
+    await callOdoo("product.product", "write", [
+      productIds,
+      { available_in_pos: true }
+    ]);
+    
+    // Get or create a POS category
+    const categories = await callOdoo<any[]>(
+      "pos.category",
+      "search_read",
+      [[]],
+      { fields: ["id", "name"], limit: 1 }
+    );
+    
+    let posCategoryId = null;
+    if (categories && categories.length > 0) {
+      posCategoryId = categories[0].id;
+    } else {
+      // Create a default POS category if none exists
+      posCategoryId = await callOdoo(
+        "pos.category",
+        "create",
+        [{ name: "All Products" }]
+      );
+    }
+    
+    // Assign products to POS category
+    if (posCategoryId) {
+      await callOdoo("product.product", "write", [
+        productIds,
+        { pos_categ_id: posCategoryId }
+      ]);
+    }
+    
+    // Make sure POS config includes all products
+    const posConfigs = await callOdoo<any[]>(
+      "pos.config",
+      "search_read",
+      [[]],
+      { fields: ["id", "name"] }
+    );
+    
+    if (posConfigs && posConfigs.length > 0) {
+      for (const config of posConfigs) {
+        await callOdoo("pos.config", "write", [
+          [config.id],
+          { 
+            limit_categories: false,  // Don't limit by categories
+            iface_available_categ_ids: [[6, 0, [posCategoryId]]]  // Include our category
+          }
+        ]);
+      }
+    }
+    
+    return res.json({
+      success: true,
+      message: `${products.length} products updated to be available in POS`,
+      products: products.map(p => ({ id: p.id, name: p.name })),
+      pos_category: posCategoryId
+    });
+  } catch (error: any) {
+    console.error("Error enabling all products for POS:", error);
+    return res.status(500).json({
+      error: "Failed to update products",
+      message: error.message
+    });
+  }
+};

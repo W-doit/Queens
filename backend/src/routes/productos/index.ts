@@ -7,6 +7,8 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  enableProductsForPOS,
+  enableAllProductsForPOS,
 } from "./productos.controller";
 import {
   getProductVariants,
@@ -102,5 +104,9 @@ router.get("/variants/:variantId/stock", asyncHandler(getVariantStock));
  * @access  Private
  */
 router.delete("/:id/variants", asyncHandler(deleteProductVariants));
+
+router.post("/enable-for-pos", asyncHandler(enableProductsForPOS));
+router.post("/enable-all-for-pos", asyncHandler(enableAllProductsForPOS));
+
 
 export default router;
