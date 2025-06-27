@@ -3,9 +3,9 @@
 // import ProductList from '@/components/productos/product-list';
 // import ProductFilters from '@/components/productos/product-filters';
 import OdooShopIframe from "@/components/productos/OdooShopIframe";
-import { useState, useEffect } from "react";
-import { fetchProductosApi } from "@/lib/odoo";
-import { ProductoOdoo } from "@/lib/odoo";
+// import { useState, useEffect } from "react";
+// import { fetchProductosApi } from "@/lib/odoo";
+// import { ProductoOdoo } from "@/lib/odoo";
 
 
 export default function ProductosPage() {
