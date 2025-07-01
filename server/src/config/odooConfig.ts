@@ -9,8 +9,8 @@ const odooConfig = {
   url: process.env.ODOO_URL || "http://localhost:8069",
   port: parseInt(process.env.ODOO_PORT || "8069"),
   db: process.env.ODOO_DB || "queens_dev", // Set the correct database name
-  username: process.env.ODOO_USERNAME || "admin",
-  password: process.env.ODOO_PASSWORD || "admin",
+  username: process.env.ODOO_USERNAME || "",
+  password: process.env.ODOO_PASSWORD || "",
 };
 
 console.log("Odoo connection configuration:", {
