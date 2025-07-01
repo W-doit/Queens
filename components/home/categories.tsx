@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
+import ComingSoon from "./comingsoon";
 
 // Mock data
 const categories = [
@@ -69,7 +70,8 @@ export default function Categories() {
             Explora nuestra colección por categorías y encuentra tu estilo perfecto
           </p>
         </div>
-
+        <ComingSoon />
+{/* 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <Link href={`/categoria/${category.id}`} key={category.id}>
@@ -101,7 +103,7 @@ export default function Categories() {
               </Card>
             </Link>
           ))}
-        </div>
+        </div> */}
       </div>
     </section>
   );

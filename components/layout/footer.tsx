@@ -55,7 +55,7 @@ export default function Footer() {
                   Tienda
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/categorias" className="text-sm text-gray-400 hover:text-primary">
                   Categorías
                 </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
                 <Link href="/nuevos" className="text-sm text-gray-400 hover:text-primary">
                   Nuevos Lanzamientos
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
@@ -82,11 +82,11 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4 font-playfair">Ayuda</h3>
             <ul className="space-y-2">
-              <li>
+              {/* <li>
                 <Link href="/sobre-nosotros" className="text-sm text-gray-400 hover:text-primary">
                   Sobre Nosotros
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/contacto" className="text-sm text-gray-400 hover:text-primary">
                   Contacto

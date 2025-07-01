@@ -31,7 +31,7 @@ const navItems = [
   { name: "Inicio", href: "/" },
   { name: "Productos", href: "/productos" },
   { name: "Categorías", href: "/#categories" }, //go to categories section
-  { name: "Vestidor Virtual", href: "/vestidor-virtual" },
+  // { name: "Vestidor Virtual", href: "/vestidor-virtual" },
   // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
   { name: "Contacto", href: "/#contacto" }, //go to contact section in newsletter route for the moment
 ];
@@ -158,7 +158,7 @@ export default function Header() {
                       <User className="h-5 w-5" />
                     </Button> */}
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  {/* <DropdownMenuContent align="end">
                     <DropdownMenuItem>
                       <Link href="/login" className="w-full">
                         Iniciar Sesión
@@ -169,7 +169,7 @@ export default function Header() {
                         Registrarse
                       </Link>
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
+                  </DropdownMenuContent> */}
                 </DropdownMenu>
               </>
             )}

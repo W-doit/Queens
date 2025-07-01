@@ -73,7 +73,7 @@ export default function HeroSection() {
             >
               <Link href="/productos">Explorar Colección</Link>
             </Button>
-            <Button
+            {/* <Button
               asChild
               variant="outline"
               size="lg"
@@ -85,7 +85,7 @@ export default function HeroSection() {
               >
                 Vestidor Virtual <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
