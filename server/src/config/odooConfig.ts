@@ -1,16 +1,49 @@
 import Odoo from "odoo-await";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 
-// Load environment variables
-dotenv.config();
+// Explicitly load the .env file from the project root
+const envPath = path.resolve(process.cwd(), ".env");
+console.log(`Looking for .env file at: ${envPath}`);
 
-// Connection details from environment variables
+if (fs.existsSync(envPath)) {
+  console.log("Loading environment variables from .env file");
+  dotenv.config({ path: envPath });
+} else {
+  console.error("ERROR: .env file not found at", envPath);
+  console.error("Please create this file with your Odoo credentials");
+  process.exit(1); // Exit the process if the .env file doesn't exist
+}
+
+// Verify that required environment variables are set
+const requiredEnvVars = [
+  "ODOO_URL",
+  "ODOO_PORT",
+  "ODOO_DB",
+  "ODOO_USERNAME",
+  "ODOO_PASSWORD",
+];
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName]
+);
+
+if (missingEnvVars.length > 0) {
+  console.error(
+    "ERROR: Missing required environment variables:",
+    missingEnvVars.join(", ")
+  );
+  console.error("Please ensure these are set in your .env file");
+  process.exit(1); // Exit the process if any required variables are missing
+}
+
+// Connection details strictly from environment variables
 const odooConfig = {
-  url: process.env.ODOO_URL || "http://localhost:8069",
-  port: parseInt(process.env.ODOO_PORT || "8069"),
-  db: process.env.ODOO_DB || "queens_dev", // Set the correct database name
-  username: process.env.ODOO_USERNAME || "",
-  password: process.env.ODOO_PASSWORD || "",
+  url: process.env.ODOO_URL!,
+  port: parseInt(process.env.ODOO_PORT!),
+  db: process.env.ODOO_DB!,
+  username: process.env.ODOO_USERNAME!,
+  password: process.env.ODOO_PASSWORD!,
 };
 
 console.log("Odoo connection configuration:", {
