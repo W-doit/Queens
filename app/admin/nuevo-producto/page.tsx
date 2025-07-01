@@ -1,5 +1,5 @@
 // import ProductForm from "@/components/productos/product-form"; No need for the moment, we use odoo iframe
-import OdooIframe from "@/components/productos/odoo-Iframe";
+import OdooIframe from "@/components/productos/OdooIframe";
 
 export default function NuevoProducto() {
   return (
