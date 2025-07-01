@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev:server": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "server": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build:start": "npm run build && npm start"
   },
   "keywords": [],
   "author": "",
@@ -12,9 +15,18 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
+    "odoo-await": "^3.4.1",
     "odoo-xmlrpc": "^1.0.8"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.8",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
   }
 }
