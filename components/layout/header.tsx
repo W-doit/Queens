@@ -132,12 +132,15 @@ export default function Header() {
               </>
             ) : (
               <>
+                <Button
                 {/* <Button
                   variant="ghost"
                   size="icon"
                   className="text-white hover:text-black"
                 >
                   <Search className="h-5 w-5" />
+                </Button>
+                <Link href="/carrito">
                 </Button> */}
                 {/* <Link href="/carrito">
                   <Button
@@ -147,6 +150,10 @@ export default function Header() {
                   >
                     <ShoppingCart className="h-5 w-5" />
                   </Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
                 </Link> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -156,6 +163,7 @@ export default function Header() {
                       className="text-white hover:text-black"
                     >
                       <User className="h-5 w-5" />
+                    </Button>
                     </Button> */}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -179,6 +187,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           {!isAdmin && (
           <div className="flex md:hidden items-center space-x-4">
+            <Link href="/carrito">
             {/* <Link href="/carrito">
               <Button
                 variant="ghost"
@@ -187,6 +196,7 @@ export default function Header() {
               >
                 <ShoppingCart className="h-5 w-5" />
               </Button>
+            </Link>
             </Link> */}
             <Button
               variant="ghost"
@@ -220,6 +230,7 @@ export default function Header() {
                   {item.name}
                 </Link>
               ))}
+              <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
               {/* <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
                 <Link
                   href="/login"
