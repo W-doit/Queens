@@ -133,6 +133,7 @@ export default function Header() {
             ) : (
               <>
                 <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   className="text-white hover:text-black"
@@ -140,6 +141,8 @@ export default function Header() {
                   <Search className="h-5 w-5" />
                 </Button>
                 <Link href="/carrito">
+                </Button> */}
+                {/* <Link href="/carrito">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -151,12 +154,17 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
+                </Link> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       className="text-white hover:text-black"
                     >
                       <User className="h-5 w-5" />
                     </Button>
+                    </Button> */}
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem>
@@ -180,6 +188,7 @@ export default function Header() {
           {!isAdmin && (
           <div className="flex md:hidden items-center space-x-4">
             <Link href="/carrito">
+            {/* <Link href="/carrito">
               <Button
                 variant="ghost"
                 size="icon"
@@ -188,6 +197,7 @@ export default function Header() {
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </Link>
+            </Link> */}
             <Button
               variant="ghost"
               size="icon"
@@ -221,6 +231,7 @@ export default function Header() {
                 </Link>
               ))}
               <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
+              {/* <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
                 <Link
                   href="/login"
                   className="text-sm font-medium text-white hover:text-primary"
@@ -235,7 +246,7 @@ export default function Header() {
                 >
                   Registrarse
                 </Link>
-              </div>
+              </div> */}
             </nav>
           </div>
         )}

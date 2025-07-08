@@ -30,12 +30,35 @@ export class ProductController {
         q, // For search functionality
         sort = "relevancia", // For sorting (default to relevance)
         available, // For availability filtering
+        size, // For size filtering
+        color, // For color filtering
+        minPrice, // For minimum price
+        maxPrice, // For maximum price
       } = req.query;
 
-      // Use the OdooService to fetch products
+      // Parse array parameters if they're comma-separated or provided multiple times
+      const categories = Array.isArray(category)
+        ? category
+        : typeof category === "string"
+        ? category.split(",")
+        : undefined;
+
+      const sizes = Array.isArray(size)
+        ? size
+        : typeof size === "string"
+        ? size.split(",")
+        : undefined;
+
+      const colors = Array.isArray(color)
+        ? color
+        : typeof color === "string"
+        ? color.split(",")
+        : undefined;
+
+      // Use the OdooService to fetch products with enhanced filtering
       const products = await this.odooService.fetchAllProducts({
         search: q as string,
-        category: category as string,
+        category: categories,
         sort: sort as string,
         available:
           available === "true"
@@ -43,6 +66,10 @@ export class ProductController {
             : available === "false"
             ? false
             : undefined,
+        sizes: sizes,
+        colors: colors,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
       });
 
       if (!products || products.length === 0) {

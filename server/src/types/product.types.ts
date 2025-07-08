@@ -13,7 +13,11 @@ export interface Product {
 
 export interface ProductQueryOptions {
   search?: string;
-  category?: string | number;
+  category?: string | number | string[];
   sort?: string;
   available?: boolean;
+  sizes?: string[];
+  colors?: string[];
+  minPrice?: number;
+  maxPrice?: number;
 }
