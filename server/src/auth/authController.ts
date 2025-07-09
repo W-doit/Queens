@@ -22,6 +22,10 @@ export const validateLogin = [
   body("password").notEmpty().withMessage("La contraseña es requerida"),
 ];
 
+export const validateForgotPassword = [
+  body("email").isEmail().withMessage("Correo electrónico inválido"),
+];
+
 export const authController = {
   register: async (req: Request, res: Response) => {
     // Validar entrada
@@ -113,16 +117,40 @@ export const authController = {
     }
   },
 
-  // Logout 
-
-logout: async (req: Request, res: Response) => {
+  logout: async (req: Request, res: Response) => {
     // For JWT auth, the client needs to remove the token
     // We can't truly invalidate the token server-side without a token blacklist
     // But we can acknowledge the logout request
-    
+
     return res.json({
       success: true,
-      message: "Sesión cerrada correctamente"
+      message: "Sesión cerrada correctamente",
     });
+  },
+
+  forgotPassword: async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const { email } = req.body;
+
+    try {
+      // Trigger Odoo's native password reset flow
+      const result = await odooAuthService.triggerOdooPasswordReset(email);
+
+      return res.status(result.success ? 200 : 400).json({
+        success: result.success,
+        message: result.message,
+      });
+    } catch (error: any) {
+      console.error("Error in forgot password:", error);
+      return res.status(500).json({
+        success: false,
+        message:
+          "Error al procesar la solicitud de restablecimiento de contraseña",
+      });
+    }
   },
 };
