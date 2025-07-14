@@ -190,4 +190,100 @@ export class OdooAuthService {
       throw new Error("Error al crear usuario en Odoo");
     }
   }
+
+  // Add these methods to your OdooAuthService class
+
+  /**
+   * Triggers Odoo's native password reset flow
+   * @param email User's email address
+   * @returns Success status and message
+   */
+  // Fix the triggerOdooPasswordReset method
+
+  async triggerOdooPasswordReset(
+    email: string
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      // 1. Authenticate as admin
+      const adminUid = await this.authenticateAdmin();
+
+      // 2. Find the user with that email
+      const userResponse = await axios.post(`${odooConfig.url}/jsonrpc`, {
+        jsonrpc: "2.0",
+        method: "call",
+        id: Date.now(),
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            odooConfig.db,
+            adminUid,
+            odooConfig.adminPassword,
+            "res.users",
+            "search_read",
+            [[["login", "=", email]]],
+            { fields: ["id", "login", "partner_id"] },
+          ],
+        },
+      });
+
+      const users = userResponse.data.result;
+      if (!users || users.length === 0) {
+        // Don't reveal if email exists
+        return {
+          success: true,
+          message:
+            "Si su correo electrónico está registrado, recibirá instrucciones para restablecer su contraseña",
+        };
+      }
+
+      const userId = users[0].id;
+      const partnerId = users[0].partner_id[0]; // Partner ID is returned as [id, name]
+
+      // 3. Use Odoo's built-in reset_password method instead
+      // This handles all the token generation and email sending
+      await axios.post(`${odooConfig.url}/jsonrpc`, {
+        jsonrpc: "2.0",
+        method: "call",
+        id: Date.now(),
+        params: {
+          service: "object",
+          method: "execute_kw",
+          args: [
+            odooConfig.db,
+            adminUid,
+            odooConfig.adminPassword,
+            "res.users",
+            "reset_password",
+            [email],
+          ],
+        },
+      });
+
+      return {
+        success: true,
+        message:
+          "Si su correo electrónico está registrado, recibirá instrucciones para restablecer su contraseña",
+      };
+    } catch (error: any) {
+      console.error(
+        "Error triggering Odoo password reset:",
+        error.response?.data || error.message
+      );
+
+      // For debugging, log the full error
+      if (error.response?.data) {
+        console.error(
+          "Odoo error details:",
+          JSON.stringify(error.response.data, null, 2)
+        );
+      }
+
+      return {
+        success: false,
+        message:
+          "Error al procesar la solicitud de restablecimiento de contraseña",
+      };
+    }
+  }
 }
