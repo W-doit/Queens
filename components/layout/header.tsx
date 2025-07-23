@@ -149,7 +149,7 @@ export default function Header() {
                   >
                     <ShoppingCart className="h-5 w-5" />
                   </Button>
-                </Link>
+                </Link> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -165,18 +165,18 @@ export default function Header() {
                     </Button>
                     </Button> */}
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
+                  {/* <DropdownMenuContent align="end"> */}
+                    {/* <DropdownMenuItem>
                       <Link href="/login" className="w-full">
                         Iniciar Sesión
                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    </DropdownMenuItem> */}
+                    {/* <DropdownMenuItem>
                       <Link href="/registro" className="w-full">
                         Registrarse
                       </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
+                    </DropdownMenuItem> */}
+                  {/* </DropdownMenuContent> */}
                 </DropdownMenu>
               </>
             )}
