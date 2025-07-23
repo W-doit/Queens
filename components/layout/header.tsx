@@ -73,7 +73,7 @@ export default function Header() {
   };
 
   return (
-        <header
+    <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled ? "shadow-md py-2" : "py-4"
       }`}
@@ -85,7 +85,7 @@ export default function Header() {
       <div className="mx-auto px-4">
         <div className="flex items-center justify-between w-full">
           <div className="w-1/3" />
-
+  
           {/* Desktop navigation */}
           {!isAdmin && (
             <nav className="hidden md:flex justify-center items-center space-x-6 w-1/3">
@@ -102,7 +102,7 @@ export default function Header() {
               ))}
             </nav>
           )}
-
+  
           {/* Admin & Admin buttons */}
           <div className="flex justify-end items-center space-x-4 w-1/3">
             {isAdmin ? (
@@ -132,13 +132,15 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   className="text-white hover:text-black"
                 >
                   <Search className="h-5 w-5" />
                 </Button>
+                <Link href="/carrito">
+                </Link> */}
                 {/* <Link href="/carrito">
                   <Button
                     variant="ghost"
@@ -151,12 +153,17 @@ export default function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
+                </Link> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       className="text-white hover:text-black"
                     >
                       <User className="h-5 w-5" />
                     </Button>
+                    </Button> */}
                   </DropdownMenuTrigger>
                   {/* <DropdownMenuContent align="end"> */}
                     {/* <DropdownMenuItem>
@@ -175,10 +182,11 @@ export default function Header() {
             )}
           </div>
         </div>
-
+  
           {/* Mobile Menu Button */}
           {!isAdmin && (
           <div className="flex md:hidden items-center space-x-4">
+            {/*<Link href="/carrito">
             {/* <Link href="/carrito">
               <Button
                 variant="ghost"
@@ -187,6 +195,7 @@ export default function Header() {
               >
                 <ShoppingCart className="h-5 w-5" />
               </Button>
+            </Link>
             </Link> */}
             <Button
               variant="ghost"
@@ -221,7 +230,8 @@ export default function Header() {
                 </Link>
               ))}
               <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
-                {/* <Link
+              {/* <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
+                <Link
                   href="/login"
                   className="text-sm font-medium text-white hover:text-primary"
                   onClick={() => setIsMenuOpen(false)}
@@ -234,7 +244,8 @@ export default function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Registrarse
-                </Link> */}
+                </Link>
+              </div> */}
               </div>
             </nav>
           </div>

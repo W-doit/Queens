@@ -33,3 +33,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+backups/queens6.dump.zip
+backups/queens6.dump.zip
