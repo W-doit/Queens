@@ -121,6 +121,11 @@ yarn install
 ```bash
 cp .env.example .env.local
 ```
+On Windows (cmd):
+```cmd
+copy .env.example .env.local
+```
+> After copying, edit `.env.local` and fill in your environment variables as needed.
 
 4. Start the development server:
 ```bash

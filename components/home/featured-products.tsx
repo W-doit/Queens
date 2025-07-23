@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { ShoppingCart, Heart } from "lucide-react";
 import { fetchProductosApi, ProductoOdoo } from "@/lib/odoo";
 import WhatsAppButton from "@/components/productos/whatsapp-button";
+import ComingSoon from "./comingsoon";
 
 
 export default function FeaturedProducts() {
@@ -54,9 +56,10 @@ useEffect(() => {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Descubre nuestras piezas más exclusivas cuidadosamente seleccionadas para ti
           </p>
-            <ComingSoon />
+          <ComingSoon />
+          
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featuredProducts.slice(0, 4).map((product) => (
             <Card
               key={product.id}
@@ -78,12 +81,12 @@ useEffect(() => {
             alt={product.name}
             fill
             className="object-cover"
-          />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          /> */}
+                {/* <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                   <div className="flex space-x-2">
-                    {/* <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
+                    <Button size="icon" className="rounded-full bg-white text-black hover:bg-primary">
                       <ShoppingCart className="h-4 w-4" />
-                    </Button> */}
+                    </Button>
                      <WhatsAppButton productName={product.name} />
                     <Button size="icon" variant="outline" className="rounded-full border-white text-black hover:bg-white/20">
                       <Heart className="h-4 w-4" />
@@ -113,8 +116,8 @@ useEffect(() => {
         {/* <div className="text-center mt-12">
           <Button asChild size="lg" className="btn-gold">
             <Link href="/productos">Ver Todos los Productos</Link>
-          </Button> */}
-        {/* </div> */}
+          </Button>
+        </div> */}
       </div>
     </section>
   );

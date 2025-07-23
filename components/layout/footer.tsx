@@ -48,14 +48,14 @@ export default function Footer() {
 
           {/* Menu 1 */}
           <div>
-            {/* <h3 className="text-lg font-semibold mb-4 font-playfair">Explorar</h3>
+            <h3 className="text-lg font-semibold mb-4 font-playfair">Explorar</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/productos" className="text-sm text-gray-400 hover:text-primary">
                   Tienda
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="/categorias" className="text-sm text-gray-400 hover:text-primary">
                   Categorías
                 </Link>
@@ -74,24 +74,19 @@ export default function Footer() {
                 <Link href="/nuevos" className="text-sm text-gray-400 hover:text-primary">
                   Nuevos Lanzamientos
                 </Link>
-              </li>
-            </ul> */}
+              </li> */}
+            </ul>
           </div>
 
           {/* Menu 2 */}
           <div>
             <h3 className="text-lg font-semibold mb-4 font-playfair">Ayuda</h3>
             <ul className="space-y-2">
-              <li>
-                {/* <Link href="/sobre-nosotros" className="text-sm text-gray-400 hover:text-primary">
+              {/* <li>
+                <Link href="/sobre-nosotros" className="text-sm text-gray-400 hover:text-primary">
                   Sobre Nosotros
-                </Link> */}
-              </li>
-              <li>
-                <Link href="/contacto" className="text-sm text-gray-400 hover:text-primary">
-                  Contacto
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link href="/politica-de-envios" className="text-sm text-gray-400 hover:text-primary">
                   Envíos y Devoluciones

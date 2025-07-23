@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ShoppingCart,
   User,
@@ -30,10 +30,9 @@ import {
 const navItems = [
   { name: "Inicio", href: "/" },
   { name: "Productos", href: "/productos" },
-  { name: "Categorías", href: "/#categories" }, //go to categories section
   { name: "Vestidor Virtual", href: "/vestidor-virtual" },
+  { name: "Contacto", href: "#footer" },
   // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
-  { name: "Contacto", href: "/#contacto" }, //go to contact section in newsletter route for the moment
 ];
 
 export default function Header() {
@@ -42,6 +41,7 @@ export default function Header() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminName, setAdminName] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,6 +72,31 @@ export default function Header() {
     window.location.href = "/login";
   };
 
+  const handleContactoClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    const footer = document.getElementById("footer");
+    if (footer) {
+      footer.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleVestidorVirtualClick = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      const section = document.getElementById("vestidor-virtual-section");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      e.preventDefault();
+      router.push("/#vestidor-virtual-section");
+    }
+  };
+
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
@@ -85,24 +110,58 @@ export default function Header() {
       <div className="mx-auto px-4">
         <div className="flex items-center justify-between w-full">
           <div className="w-1/3" />
-  
+
           {/* Desktop navigation */}
           {!isAdmin && (
             <nav className="hidden md:flex justify-center items-center space-x-6 w-1/3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    pathname === item.href ? "text-primary" : "text-white"
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                if (item.name === "Vestidor Virtual") {
+                  return (
+                    <a
+                      key={item.href}
+                      href={
+                        pathname === "/"
+                          ? "#vestidor-virtual-section"
+                          : "/#vestidor-virtual-section"
+                      }
+                      onClick={handleVestidorVirtualClick}
+                      className={`text-sm font-medium transition-colors hover:text-primary ${
+                        pathname === item.href ? "text-primary" : "text-white"
+                      }`}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                } else if (item.name === "Contacto") {
+                  return (
+                    <a
+                      key={item.href}
+                      href="#footer"
+                      onClick={handleContactoClick}
+                      className={`text-sm font-medium transition-colors hover:text-primary ${
+                        pathname === item.href ? "text-primary" : "text-white"
+                      }`}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`text-sm font-medium transition-colors hover:text-primary ${
+                        pathname === item.href ? "text-primary" : "text-white"
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                }
+              })}
             </nav>
           )}
-  
+
           {/* Admin & Admin buttons */}
           <div className="flex justify-end items-center space-x-4 w-1/3">
             {isAdmin ? (
@@ -138,9 +197,7 @@ export default function Header() {
                   className="text-white hover:text-black"
                 >
                   <Search className="h-5 w-5" />
-                </Button>
-                <Link href="/carrito">
-                </Link> */}
+                </Button> */}
                 {/* <Link href="/carrito">
                   <Button
                     variant="ghost"
@@ -152,41 +209,35 @@ export default function Header() {
                 </Link> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                </Link> */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
                     {/* <Button
                       variant="ghost"
                       size="icon"
                       className="text-white hover:text-black"
                     >
                       <User className="h-5 w-5" />
-                    </Button>
                     </Button> */}
                   </DropdownMenuTrigger>
-                  {/* <DropdownMenuContent align="end"> */}
-                    {/* <DropdownMenuItem>
+                  {/* <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
                       <Link href="/login" className="w-full">
                         Iniciar Sesión
                       </Link>
-                    </DropdownMenuItem> */}
-                    {/* <DropdownMenuItem>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
                       <Link href="/registro" className="w-full">
                         Registrarse
                       </Link>
-                    </DropdownMenuItem> */}
-                  {/* </DropdownMenuContent> */}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent> */}
                 </DropdownMenu>
               </>
             )}
           </div>
         </div>
-  
+
           {/* Mobile Menu Button */}
           {!isAdmin && (
           <div className="flex md:hidden items-center space-x-4">
-            {/*<Link href="/carrito">
             {/* <Link href="/carrito">
               <Button
                 variant="ghost"
@@ -195,7 +246,6 @@ export default function Header() {
               >
                 <ShoppingCart className="h-5 w-5" />
               </Button>
-            </Link>
             </Link> */}
             <Button
               variant="ghost"
@@ -215,38 +265,42 @@ export default function Header() {
         {!isAdmin && isMenuOpen && (
           <div className="md:hidden py-4 animate-fade-in">
             <nav className="flex flex-col space-y-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
-                    pathname === item.href
-                      ? "text-primary bg-white/10"
-                      : "text-white hover:text-primary hover:bg-white/5"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
-              {/* <div className="border-t border-white/20 pt-4 flex flex-col space-y-2">
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-white hover:text-primary"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Iniciar Sesión
-                </Link>
-                <Link
-                  href="/registro"
-                  className="text-sm font-medium text-white hover:text-primary"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Registrarse
-                </Link>
-              </div> */}
-              </div>
+              {navItems.map((item) => {
+                if (item.name === "Contacto") {
+                  return (
+                    <a
+                      key={item.href}
+                      href="#footer"
+                      onClick={(e) => {
+                        handleContactoClick(e);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
+                        pathname === item.href
+                          ? "text-primary bg-white/10"
+                          : "text-white hover:text-primary hover:bg-white/5"
+                      }`}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                } else {
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
+                        pathname === item.href
+                          ? "text-primary bg-white/10"
+                          : "text-white hover:text-primary hover:bg-white/5"
+                      }`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                }
+              })}
             </nav>
           </div>
         )}
