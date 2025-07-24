@@ -16,3 +16,8 @@
 //
 //   return <ProductDetailClient product={product} />;
 // }
+
+// Minimal placeholder to satisfy Next.js dynamic route requirements
+export default function ProductPage() {
+  return null;
+}
