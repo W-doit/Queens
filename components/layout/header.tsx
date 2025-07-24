@@ -29,7 +29,7 @@ import {
 
 const navItems = [
   { name: "Inicio", href: "/" },
-  { name: "Productos", href: "/productos" },
+  { name: "Tienda", href: "/productos" },
   { name: "Vestidor Virtual", href: "/vestidor-virtual" },
   { name: "Contacto", href: "#footer" },
   // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
@@ -75,26 +75,24 @@ export default function Header() {
   const handleContactoClick = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
-    e.preventDefault();
-    const footer = document.getElementById("footer");
-    if (footer) {
-      footer.scrollIntoView({ behavior: "smooth" });
+    if (pathname === "/") {
+      e.preventDefault();
+      const footer = document.getElementById("footer");
+      if (footer) {
+        footer.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      e.preventDefault();
+      window.location.href = "/#footer";
     }
   };
 
   const handleVestidorVirtualClick = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
-    if (pathname === "/") {
-      e.preventDefault();
-      const section = document.getElementById("vestidor-virtual-section");
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      e.preventDefault();
-      router.push("/#vestidor-virtual-section");
-    }
+    // Always navigate to /vestidor-virtual
+    e.preventDefault();
+    window.location.href = "/vestidor-virtual";
   };
 
   return (
@@ -119,14 +117,10 @@ export default function Header() {
                   return (
                     <a
                       key={item.href}
-                      href={
-                        pathname === "/"
-                          ? "#vestidor-virtual-section"
-                          : "/#vestidor-virtual-section"
-                      }
+                      href="/vestidor-virtual"
                       onClick={handleVestidorVirtualClick}
                       className={`text-sm font-medium transition-colors hover:text-primary ${
-                        pathname === item.href ? "text-primary" : "text-white"
+                        pathname === "/vestidor-virtual" ? "text-primary" : "text-white"
                       }`}
                     >
                       {item.name}

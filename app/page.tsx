@@ -17,10 +17,25 @@ function scrollToVestidorWithRetry(retries = 10) {
   }
 }
 
+function scrollToFooterWithRetry(retries = 10) {
+  if (window.location.hash === '#footer') {
+    const footer = document.getElementById('footer');
+    if (footer) {
+      footer.scrollIntoView({ behavior: 'smooth' });
+    } else if (retries > 0) {
+      setTimeout(() => scrollToFooterWithRetry(retries - 1), 100);
+    }
+  }
+}
+
 export default function Home() {
   useEffect(() => {
     scrollToVestidorWithRetry();
-    const onHashChange = () => scrollToVestidorWithRetry();
+    scrollToFooterWithRetry();
+    const onHashChange = () => {
+      scrollToVestidorWithRetry();
+      scrollToFooterWithRetry();
+    };
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
