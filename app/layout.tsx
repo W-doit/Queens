@@ -24,6 +24,11 @@ const raleway = Raleway({
 export const metadata: Metadata = {
   title: 'Queens | Corona tu estilo',
   description: 'Tienda de moda elegante para la mujer moderna',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +40,10 @@ export default function RootLayout({
   
   return (
     <html lang="es" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      </head>
       <body className={`${playfair.variable} ${raleway.variable} font-sans min-h-screen flex flex-col ${isHomePage ? 'home-page' : ''}`}>
          <FavoritesProvider>
         <CartProvider>

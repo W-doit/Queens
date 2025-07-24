@@ -7,8 +7,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function ProductDetailPage(props: { params: { id: string } }) {
-  const { params } = props;
+export default async function Page({ params }: { params: { id: string } }) {
   const product = await fetchProductoById(params.id);
 
   if (!product) {

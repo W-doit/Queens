@@ -11,7 +11,7 @@ function getMenuHeight() {
   return MENU_HEIGHT_DESKTOP;
 }
 
-const OdooShopIframe: React.FC = () => {
+const OdooShopIframe: React.FC<{ onLoad?: () => void }> = ({ onLoad }) => {
   const [menuHeight, setMenuHeight] = React.useState(getMenuHeight());
 
   React.useEffect(() => {
@@ -38,6 +38,7 @@ const OdooShopIframe: React.FC = () => {
         style={{ border: "none", width: "100vw", height: "100%" }}
         loading="lazy"
         title="Tienda Odoo"
+        onLoad={onLoad}
       />
     </div>
   );
