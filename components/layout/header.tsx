@@ -29,9 +29,10 @@ import {
 
 const navItems = [
   { name: "Inicio", href: "/" },
-  { name: "Tienda", href: "/productos" },
+  { name: "Tienda", href: "https://queensfashion.sumupstore.com/", external: true },
+  { name: "Redes", href: "/redes" },
   { name: "Vestidor Virtual", href: "/vestidor-virtual" },
-  { name: "Contacto", href: "#footer" },
+  { name: "Contacto", href: "/contacto" },
   // { name: "Sobre Nosotros", href: "/sobre-nosotros" },
 ];
 
@@ -126,15 +127,14 @@ export default function Header() {
                       {item.name}
                     </a>
                   );
-                } else if (item.name === "Contacto") {
+                } else if (item.external) {
                   return (
                     <a
                       key={item.href}
-                      href="#footer"
-                      onClick={handleContactoClick}
-                      className={`text-sm font-medium transition-colors hover:text-primary ${
-                        pathname === item.href ? "text-primary" : "text-white"
-                      }`}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium transition-colors hover:text-primary text-white"
                     >
                       {item.name}
                     </a>
@@ -260,20 +260,15 @@ export default function Header() {
           <div className="md:hidden py-4 animate-fade-in">
             <nav className="flex flex-col space-y-4">
               {navItems.map((item) => {
-                if (item.name === "Contacto") {
+                if (item.external) {
                   return (
                     <a
                       key={item.href}
-                      href="#footer"
-                      onClick={(e) => {
-                        handleContactoClick(e);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`text-sm font-medium px-2 py-1 rounded transition-colors ${
-                        pathname === item.href
-                          ? "text-primary bg-white/10"
-                          : "text-white hover:text-primary hover:bg-white/5"
-                      }`}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium px-2 py-1 rounded transition-colors text-white hover:text-primary hover:bg-white/5"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       {item.name}
                     </a>
