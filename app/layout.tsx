@@ -7,6 +7,7 @@ import { FavoritesProvider } from "@/context/FavContext";
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import WhatsappButton from '@/components/ui/whatsapp-button';
 
 
 const playfair = Playfair_Display({
@@ -58,6 +59,8 @@ export default function RootLayout({
           </main>
           <Footer/>
           <Toaster />
+          {/* Floating WhatsApp Button */}
+          <WhatsappButton />
         </ThemeProvider>
         </CartProvider>
        </FavoritesProvider>
